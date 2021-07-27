@@ -1,8 +1,9 @@
 # Jamaica Energy Model (JEM)
 ### A high-level power flow model of Jamaica's energy system
-### Development Status: **Under Development**
 
-<img align="center" width="500" src="https://github.com/nismod/JEM/blob/main/demo/schematic.png">
+<img align="center" width="700" src="https://github.com/nismod/JEM/blob/main/demo/schematic.png">
+
+#### Development Status: **Under Development**
 
 This repository contains a simulation model for Jamaica's energy system formulated as an arc-node network. Based on a given supply and demand curve, JEM solves for flows of electricity across the network using linear programming.
 
