@@ -39,7 +39,7 @@ _outputs/_
 ### Requirements
 The model requires [Gurobi](https://www.gurobi.com) and the associated [GurobiPy](https://www.gurobi.com) library for the optimisation. In addition, standard scientific libraries in Python are needed such as [pandas](https://pandas.pydata.org/), [numpy](https://numpy.org/), [matplotlib](https://matplotlib.org/) etc. Requirements for spatial network analysis include [QGis](https://www.qgis.org/en/site/), [geopandas](https://geopandas.org/install.html), and [snkit](https://github.com/tomalrussell/snkit).
 
-<i>Note</i>: The Gurobi package requires a license for usage but this can be obtained freely for academic use. An open-source alternative version of the model is currently being developed in the [PuLP](https://github.com/coin-or/pulp) library and the [Julia](https://julialang.org) programming language.  
+<i>Note</i>: The Gurobi package requires a license for usage but this can be obtained freely for academic use. <!-- An open-source alternative version of the model is currently being developed in the [PuLP](https://github.com/coin-or/pulp) library and the [Julia](https://julialang.org) programming language.   -->
 
 <!-- ### Getting started
 Download and clone this repository.
