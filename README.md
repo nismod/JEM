@@ -1,9 +1,7 @@
-# Jamaica Energy Model (JEM)
-### A high-level power flow model of Jamaica's energy system
-
 <img align="center" width="700" src="https://github.com/nismod/JEM/blob/main/demo/schematic.png">
 
-#### Development Status: **Under Development**
+# Jamaica Energy Model (JEM)
+### A high-level power flow model of Jamaica's energy system
 
 This repository contains a simulation model for Jamaica's energy system formulated as an arc-node network. Based on a given supply and demand curve, JEM solves for flows of electricity across the network using linear programming.
 
@@ -37,7 +35,6 @@ _qgis/_
 
 _outputs/_
 - All model outputs such as figures, data, and statistics are saved here. -->
-
 
 ### Requirements
 The model requires [Gurobi](https://www.gurobi.com) and the associated [GurobiPy](https://www.gurobi.com) library for the optimisation. In addition, standard scientific libraries in Python are needed such as [pandas](https://pandas.pydata.org/), [numpy](https://numpy.org/), [matplotlib](https://matplotlib.org/) etc. Requirements for spatial network analysis include [QGis](https://www.qgis.org/en/site/), [geopandas](https://geopandas.org/install.html), and [snkit](https://github.com/tomalrussell/snkit).
