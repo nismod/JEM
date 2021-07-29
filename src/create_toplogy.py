@@ -73,6 +73,10 @@ def add_edge_notation(network):
     network.edges[j_field] = network.edges.geometry.apply(lambda geom: nearest(Point(geom.coords[-1]), network.nodes)[id_attribute])
     return network
 
+# reverse arc direction
+def flip(line):   
+    return LineString(reversed(line.coords))
+
 #=======================
 # PRE-PROCESSING
 
@@ -201,12 +205,34 @@ print('> Added junctions and sinks')
 
 
 #===
+# Connectivity
+
+nodes_to_test = network.nodes[network.nodes.Subtype.isin(['pole'])].reset_index(drop=True)
+for n in nodes_to_test.id:
+    degree = node_connectivity_degree(node=n, network=network)
+    if degree == 1:
+        # change node type
+        network.nodes.loc[network.nodes.id == n, 'Subtype'] = 'demand'
+        # reverse arc direction
+        prev_line = network.edges[network.edges.from_id == n].geometry.values[0]
+        network.edges.loc[network.edges.from_id == n, 'geometry'] = flip(prev_line)
+
+
+
+#===
 # SAVE DATA
 
 network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo_processed.shp')
 network.edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_processed.shp')
 
 print('> Saved data to /data/demo/')
+    
+
+
+
+
+
+
 
 
 
