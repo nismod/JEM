@@ -8,10 +8,10 @@
         Workflow:
             - Merge Multilinestrings from power line data       [Complete]
             - Add junction nodes where lines split              [Complete]
-            - Add sink nodes to low voltage                     [TO DO]
-            - Connect supply to substations                     [TO DO]
-            - Create bi-directional high voltage grid           [TO DO]
-            - Connect high voltage grid to low voltage grid     [TO DO]
+            - Add sink nodes to low voltage                     [Complete]
+            - Connect supply to substations                     [Complete]
+            - Connect high voltage grid to low voltage grid     [Complete]
+            - Create bi-directional grid                        [TO DO]
             - Save processed spatial data                       [Complete]
 
 """
@@ -205,8 +205,7 @@ print('> Added junctions and sinks')
 
 
 #===
-# ENSURE 
-
+# CONVERT FALSE JUNCTIONS TO SINKS 
 nodes_to_test = network.nodes[network.nodes.Subtype.isin(['pole'])].reset_index(drop=True)
 for n in nodes_to_test.id:
     degree = node_connectivity_degree(node=n, network=network)
@@ -216,6 +215,14 @@ for n in nodes_to_test.id:
         # reverse arc direction
         prev_line = network.edges[network.edges.from_id == n].geometry.values[0]
         network.edges.loc[network.edges.from_id == n, 'geometry'] = flip(prev_line)
+
+
+
+#===
+# FORMATTING
+
+# add length to line data
+network.edges['LengthKM'] = network.edges.geometry.length * 10**-3
 
 
 
