@@ -205,7 +205,7 @@ print('> Added junctions and sinks')
 
 
 #===
-# Connectivity
+# ENSURE 
 
 nodes_to_test = network.nodes[network.nodes.Subtype.isin(['pole'])].reset_index(drop=True)
 for n in nodes_to_test.id:
@@ -226,26 +226,3 @@ network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo
 network.edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_processed.shp')
 
 print('> Saved data to /data/demo/')
-    
-
-
-
-
-
-
-
-
-
-# #----
-# # 1.1: Add junctions where lines split
-
-# network = snkit.network.add_endpoints(network)
-
-# # Round geom before dropping duplicates
-# network.nodes.geometry = network.nodes.geometry.apply(lambda x: loads(re.sub(simpledec, coord_rounding, x.wkt)))
-# # Drop duplicates
-# network.nodes = snkit.network.drop_duplicate_geometries(network.nodes)
-
-# # Add metadata
-# network.nodes.loc[network.nodes.Type.isna(),'Type'] = 'junction'
-# network.nodes.loc[network.nodes.Reference.isna(),'Reference'] = 'snkit'
