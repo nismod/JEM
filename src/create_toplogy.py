@@ -77,6 +77,8 @@ def add_edge_notation(network):
 def flip(line):   
     return LineString(reversed(line.coords))
 
+
+
 #=======================
 # PRE-PROCESSING
 
