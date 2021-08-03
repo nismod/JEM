@@ -53,7 +53,7 @@ def jem_merge_edges(network):
     # add topology
     network = add_topology(network, id_col='id')
     # merge using snkit
-    network = merge_edges(network,by='Subtype')
+    network = merge_edges(network,by='asset_type')
     return network.edges
 
 # Add ID attribute to nodes
@@ -102,7 +102,7 @@ edges_hv = edges_hv.explode()
 #---
 # Nodes pre-processing
 
-# delete NoneTypes
+# delete Noneasset_types
 nodes = nodes[~nodes.geometry.isna()].reset_index(drop=True)
 
 
@@ -139,7 +139,7 @@ print('> Removed Multilinestrings')
 lv_voltages = ['24 kV', '12 kV']
 
 # get substations
-substations = network.nodes[network.nodes.Subtype == 'substation'].geometry
+substations = network.nodes[network.nodes.asset_type == 'substation'].geometry
 
 # loop
 for s in substations:
@@ -171,9 +171,9 @@ jps_nodes = network.nodes.copy()
 # add endpoints
 network = add_endpoints(network) 
 
-# update Type
-network.nodes.loc[~network.nodes.Type.isin(['sink','junction','sink']),'Subtype'] = 'pole'
-network.nodes.loc[~network.nodes.Type.isin(['sink','junction','sink']),'Type'] = 'junction'
+# update asset_type
+network.nodes.loc[~network.nodes.asset_type.isin(['sink','junction','sink']),'asset_type'] = 'pole'
+network.nodes.loc[~network.nodes.asset_type.isin(['sink','junction','sink']),'asset_type'] = 'junction'
 
 # split edges between nodes
 network = split_edges_at_nodes(network)
@@ -194,13 +194,13 @@ for s in sinks:
         true_sinks.append(s)
 
 # update true sinks
-network.nodes.loc[network.nodes.id.isin(true_sinks),'Type'] = 'sink'
-network.nodes.loc[network.nodes.id.isin(true_sinks),'Subtype'] = 'demand'
+network.nodes.loc[network.nodes.id.isin(true_sinks),'asset_type'] = 'sink'
+network.nodes.loc[network.nodes.id.isin(true_sinks),'asset_type'] = 'demand'
 
-# remap Type and Subtype from original data
-for n in jps_nodes.Name:
-    network.nodes.loc[network.nodes.Name == n, 'Type'] = jps_nodes.loc[jps_nodes.Name == n].Type.iloc[0]
-    network.nodes.loc[network.nodes.Name == n, 'Subtype'] = jps_nodes.loc[jps_nodes.Name == n].Subtype.iloc[0]
+# remap asset_type and asset_type from original data
+for n in jps_nodes.title:
+    network.nodes.loc[network.nodes.title == n, 'asset_type'] = jps_nodes.loc[jps_nodes.title == n].asset_type.iloc[0]
+    network.nodes.loc[network.nodes.title == n, 'asset_type'] = jps_nodes.loc[jps_nodes.title == n].asset_type.iloc[0]
 
 print('> Added junctions and sinks')
 
@@ -208,12 +208,12 @@ print('> Added junctions and sinks')
 
 #===
 # CONVERT FALSE JUNCTIONS TO SINKS 
-nodes_to_test = network.nodes[network.nodes.Subtype.isin(['pole'])].reset_index(drop=True)
+nodes_to_test = network.nodes[network.nodes.asset_type.isin(['pole'])].reset_index(drop=True)
 for n in nodes_to_test.id:
     degree = node_connectivity_degree(node=n, network=network)
     if degree == 1:
-        # change node type
-        network.nodes.loc[network.nodes.id == n, 'Subtype'] = 'demand'
+        # change node asset_type
+        network.nodes.loc[network.nodes.id == n, 'asset_type'] = 'demand'
         # reverse arc direction
         prev_line = network.edges[network.edges.from_id == n].geometry.values[0]
         network.edges.loc[network.edges.from_id == n, 'geometry'] = flip(prev_line)
@@ -224,7 +224,7 @@ for n in nodes_to_test.id:
 # FORMATTING
 
 # add length to line data
-network.edges['LengthKM'] = network.edges.geometry.length * 10**-3
+network.edges['length_km'] = network.edges.geometry.length * 10**-3
 
 
 
