@@ -113,7 +113,8 @@ nodes = nodes[~nodes.geometry.isna()].reset_index(drop=True)
 # Define network
 network = Network(nodes,edges_hv)
 
-
+# save jps nodes
+jps_nodes = network.nodes.copy()
 
 #===
 # REMOVE MULTILINESTRINGS
@@ -164,9 +165,6 @@ print('> Updated coords')
     
 #===
 # ADD JUNCTIONS AND SINKS
-
-# save jps nodes
-jps_nodes = network.nodes.copy()
 
 # add endpoints
 network = add_endpoints(network) 
