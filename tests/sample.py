@@ -21,8 +21,8 @@ nodes = gpd.read_file(path_to_nodes)
 sample = ['St. James']
 
 # sample
-nodes = nodes.loc[nodes.PARISH.isin(sample)].reset_index(drop=True)
-edges = edges.loc[edges.PARISH.isin(sample)].reset_index(drop=True)
+nodes = nodes.loc[nodes.parish.isin(sample)].reset_index(drop=True)
+edges = edges.loc[edges.parish.isin(sample)].reset_index(drop=True)
 
 nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo.shp')
 edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo.shp')
