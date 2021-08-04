@@ -218,6 +218,7 @@ for n in nodes_to_test.id:
     degree = node_connectivity_degree(node=n, network=network)
     if degree == 1:
         # change node asset_type
+        network.nodes.loc[network.nodes.id == n, 'asset_type'] = 'sink'
         network.nodes.loc[network.nodes.id == n, 'subtype'] = 'demand'
         # reverse arc direction
         prev_line = network.edges[network.edges.from_id == n].geometry.values[0]
