@@ -140,13 +140,13 @@ print('> Removed Multilinestrings')
 lv_voltages = ['24 kV', '12 kV']
 
 # get substations
-substations = network.nodes[network.nodes.asset_type == 'substation'].geometry
+substations = network.nodes[network.nodes.subtype == 'substation'].geometry
 
 # loop
 for s in substations:
     # index edges
     idx_edges = edges_within(s,
-                             network.edges[network.edges.VOLTAGE.isin(lv_voltages)],
+                             network.edges[network.edges.voltage.isin(lv_voltages)],
                              distance=40)
     # snap
     for e in idx_edges.itertuples():
@@ -170,7 +170,7 @@ print('> Updated coords')
 network = add_endpoints(network) 
 
 # update asset_type
-network.nodes.loc[~network.nodes.asset_type.isin(['sink','junction','sink']),'asset_type'] = 'pole'
+network.nodes.loc[~network.nodes.subtype.isin(['sink','junction','sink']),'subtype'] = 'pole'
 network.nodes.loc[~network.nodes.asset_type.isin(['sink','junction','sink']),'asset_type'] = 'junction'
 
 # split edges between nodes
@@ -193,12 +193,12 @@ for s in sinks:
 
 # update true sinks
 network.nodes.loc[network.nodes.id.isin(true_sinks),'asset_type'] = 'sink'
-network.nodes.loc[network.nodes.id.isin(true_sinks),'asset_type'] = 'demand'
+network.nodes.loc[network.nodes.id.isin(true_sinks),'subtype'] = 'demand'
 
 # remap asset_type and asset_type from original data
 for n in jps_nodes.title:
     network.nodes.loc[network.nodes.title == n, 'asset_type'] = jps_nodes.loc[jps_nodes.title == n].asset_type.iloc[0]
-    network.nodes.loc[network.nodes.title == n, 'asset_type'] = jps_nodes.loc[jps_nodes.title == n].asset_type.iloc[0]
+    network.nodes.loc[network.nodes.title == n, 'subtype'] = jps_nodes.loc[jps_nodes.title == n].subtype.iloc[0]
 
 print('> Added junctions and sinks')
 
@@ -206,12 +206,13 @@ print('> Added junctions and sinks')
 
 #===
 # CONVERT FALSE JUNCTIONS TO SINKS 
-nodes_to_test = network.nodes[network.nodes.asset_type.isin(['pole'])].reset_index(drop=True)
+nodes_to_test = network.nodes[network.nodes.subtype.isin(['pole'])].reset_index(drop=True)
 for n in nodes_to_test.id:
+#for n in ['node_1694']:
     degree = node_connectivity_degree(node=n, network=network)
     if degree == 1:
         # change node asset_type
-        network.nodes.loc[network.nodes.id == n, 'asset_type'] = 'demand'
+        network.nodes.loc[network.nodes.id == n, 'subtype'] = 'demand'
         # reverse arc direction
         prev_line = network.edges[network.edges.from_id == n].geometry.values[0]
         network.edges.loc[network.edges.from_id == n, 'geometry'] = flip(prev_line)
