@@ -34,7 +34,8 @@ sys.path.append("../../")
 # Import local copy of snkit
 from JEM.snkit.snkit.src.snkit.network import *
 
-
+## DEMO?
+demo_run_type = False
 
 #=======================
 # FUNCTIONS
@@ -83,8 +84,13 @@ def flip(line):
 # PRE-PROCESSING
 
 # File paths
-path_to_edges = '../data/demo/edges_demo.shp'
-path_to_nodes = '../data/demo/nodes_demo.shp'
+if demo_run_type is True:
+    path_to_edges = '../data/demo/edges_demo.shp'
+    path_to_nodes = '../data/demo/nodes_demo.shp'
+else:
+    # Demo file paths
+    path_to_edges = '../data/spatial/edges.shp'
+    path_to_nodes = '../data/spatial/nodes.shp'
 
 # Read edges and nodes
 edges = gpd.read_file(path_to_edges)
@@ -230,7 +236,12 @@ network.edges['length_km'] = network.edges.geometry.length * 10**-3
 #===
 # SAVE DATA
 
-network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo_processed.shp')
-network.edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_processed.shp')
+if demo_run_type is True:
+    network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo_processed.shp')
+    network.edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_processed.shp')
+else:
+    network.nodes.to_file(driver='ESRI Shapefile', filename='../data/spatial/nodes_processed.shp')
+    network.edges.to_file(driver='ESRI Shapefile', filename='../data/spatial/edges_processed.shp')
+
 
 print('> Saved data to /data/demo/')
