@@ -235,6 +235,19 @@ network.edges['length_km'] = network.edges.geometry.length * 10**-3
 
 
 #===
+# UPDATE NETWORK NOTATION
+
+# drop existing
+network.edges.drop(['id','from_id','to_id'],axis=1)
+network.nodes.drop(['id'],axis=1)
+
+# update
+network = add_id_to_nodes(network)
+network = add_edge_notation(network)
+
+
+
+#===
 # SAVE DATA
 
 if demo_run_type is True:
