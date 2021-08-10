@@ -21,12 +21,14 @@ G = nx.Graph()
 # add nodes
 G.add_nodes_from(nodes.id.to_list())
 
-# add edges
-edges_as_list = [(i,j,w) for i in edges.from_id for j in edges.to_id for w in edges.length_km]
+# create list of weighted edges
+edges_as_list = [(edges.loc[i].from_id, 
+                  edges.loc[i].to_id, 
+                  edges.loc[i].length_km) for i in edges.index]
 
-
+# add edges to graph
 G.add_weighted_edges_from(edges_as_list)
-
 
 #------
 # Shortest path setup
+#   TO DO
