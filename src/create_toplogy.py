@@ -11,7 +11,7 @@
             - Add sink nodes to low voltage                     [Complete]
             - Connect supply to substations                     [Complete]
             - Connect high voltage grid to low voltage grid     [Complete]
-            - Create bi-directional grid                        [TO DO]
+            - Create bi-directional grid                        [Complete]
             - Save processed spatial data                       [Complete]
 
 """
@@ -285,8 +285,8 @@ if demo_run_type is True:
 #===
 # DOUBLE-UP EDGES
 
-def double_edges(edges):
-    ''' Double edge for directionality
+def bidirectional_edges(edges):
+    ''' Converts to edges bi-directional edges
     '''
     ee = edges.copy()
     # reverse ids
@@ -299,8 +299,8 @@ def double_edges(edges):
     edges = edges.append(ee,ignore_index=True)
     return edges
 
-network.edges       = double_edges(network.edges)
-edges_microsample   = double_edges(edges_microsample)
+network.edges       = bidirectional_edges(network.edges)
+edges_microsample   = bidirectional_edges(edges_microsample)
 
 print('> Doubled up edges')
 
