@@ -31,8 +31,6 @@ class infrasim():
         if '.shp' in nodes and '.shp' in edges:
             nodes = gpd.read_file(nodes)
             edges = gpd.read_file(edges)
-            # add topology to edge data
-            edges = spatial.add_graph_topology(nodes,edges,id_attribute='Name')
             # drop geometry
             # nodes,edges = spatial.drop_geom(nodes,edges)
 
@@ -47,20 +45,20 @@ class infrasim():
         # restrict timesteps
         timesteps_restriction = kwargs.get("timesteps", None)
         if timesteps_restriction is not None:
-            flows = flows.loc[(flows.Timestep >= timesteps_restriction[0]) & \
-                              (flows.Timestep <= timesteps_restriction[1])]
+            flows = flows.loc[(flows.Timestep >= timesteps_restriction) & \
+                              (flows.Timestep <= timesteps_restriction)]
 
         #---
         # Add super source
         super_source = kwargs.get("super_source", False)
         if super_source==True:
-            edges = utils.add_super_source(nodes,edges,commodities=edges.Commodity.unique())
+            edges = utils.add_super_source(nodes,edges)
 
         #---
         # Add super sink
         super_sink = kwargs.get("super_sink", False)
         if super_sink==True:
-            edges = utils.add_super_sink(nodes,edges,commodities=edges.Commodity.unique())
+            edges = utils.add_super_sink(nodes,edges)
 
         #---
         # Tidy flow data
@@ -83,14 +81,9 @@ class infrasim():
         self.nodes          = nodes
         self.indices        = metainfo['edge_index_variables']
         self.constants      = constants
-        self.commodities    = self.edges.Commodity.unique().tolist()
-        self.node_types     = self.nodes.Type.unique().tolist()
-        self.technologies   = self.nodes.Subtype.unique().tolist()
-        self.functions      = self.nodes.Function.unique().tolist()
+        self.node_types     = self.nodes.asset_type.unique().tolist()
+        self.technologies   = self.nodes.subtype.unique().tolist()
         self.timesteps      = self.flows.Timestep.unique().tolist()
-        self.days           = self.flows.Day.unique().tolist()
-        self.months         = self.flows.Month.unique().tolist()
-        self.years          = self.flows.Year.unique().tolist()
 
         #---
         # define gurobi model
@@ -114,7 +107,7 @@ class infrasim():
 
         '''
 
-        start_time = time.clock()
+        start_time = time.process_time()
 
         #======================================================================
         # VARIABLES
