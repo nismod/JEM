@@ -32,6 +32,9 @@ import random
 # READ DATA
 
 # File paths
+# path_to_edges = '../data/demo/edges_demo_microsample_processed.shp'
+# path_to_nodes = '../data/demo/nodes_demo_microsample_processed.shp'
+
 path_to_edges = '../data/demo/edges_demo_processed.shp'
 path_to_nodes = '../data/demo/nodes_demo_processed.shp'
 
@@ -45,10 +48,10 @@ nodes = gpd.read_file(path_to_nodes)
 # PRE-PROCESS
 
 # get sources and sinks
-types = ['source','sink']
+asset_types = ['source','sink']
 
 # index flow nodes
-flow_nodes = nodes.loc[nodes.Type.isin(types)].reset_index(drop=True)
+flow_nodes = nodes.loc[nodes.asset_type.isin(asset_types)].reset_index(drop=True)
 
 # get columns of interest
 flow_nodes = flow_nodes[['id']]
@@ -66,28 +69,29 @@ flow_nodes.columns = flow_nodes.columns.droplevel()
 nodes_with_flow = flow_nodes.columns.to_list()
 
 # add infrasim attributes
-flow_nodes['Timestep'] = flow_nodes.index + 1
+flow_nodes['timestep'] = flow_nodes.index + 1
 
 # reorder columns
-flow_nodes = flow_nodes[ ['Timestep'] + nodes_with_flow ]
+flow_nodes = flow_nodes[ ['timestep'] + nodes_with_flow ]
 
 # sample a set number of timesteps
-flow_nodes = flow_nodes[flow_nodes.Timestep < 25].reset_index(drop=True)
+flow_nodes = flow_nodes[flow_nodes.timestep < 25].reset_index(drop=True)
 
 
 
 #=======================
 # CREATE DATA
 
-supply_nodes = nodes.loc[nodes.Type.isin(['source']),'id'].to_list()
-demand_nodes = nodes.loc[nodes.Type.isin(['sink']),'id'].to_list()
+supply_nodes = nodes.loc[nodes.asset_type.isin(['source']),'id'].to_list()
+demand_nodes = nodes.loc[nodes.asset_type.isin(['sink']),'id'].to_list()
 
 # supply
 flow_nodes[supply_nodes] = 9999
 
 # demand
 for c in demand_nodes:
-    flow_nodes[c] = [random.random()*10 for i in range(0,len(flow_nodes))]
+    #flow_nodes[c] = [random.random()*10 for i in range(0,len(flow_nodes))]
+    flow_nodes[c] = [5 for i in range(0,len(flow_nodes))]
 
 
 

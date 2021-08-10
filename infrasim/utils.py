@@ -62,8 +62,8 @@ def create_dir(path):
 def tidy(flows):
     ''' Convert supply/demand data to tidy format
     '''
-    flows['Timestep'] = [i for i in range(1,len(flows)+1)]
-    id_vars = metainfo['flow_header'] + ['Timestep']
+    flows['timestep'] = [i for i in range(1,len(flows)+1)]
+    id_vars = metainfo['flow_header'] + ['timestep']
     tidy = flows.melt(id_vars=id_vars,var_name='Node',value_name='Value')
     return tidy
 
@@ -72,10 +72,10 @@ def map_timesteps_to_date(flows,mappable):
     ''' Function to map dates to timesteps
     '''
     # get time reference table
-    id_vars = metainfo['flow_header'] + ['Timestep']
-    time_ref = flows[id_vars].groupby(by='Timestep').max().reset_index()
+    id_vars = metainfo['flow_header'] + ['timestep']
+    time_ref = flows[id_vars].groupby(by='timestep').max().reset_index()
     # perform merge
-    mapped = pd.merge(mappable,time_ref,on='Timestep',how='right')
+    mapped = pd.merge(mappable,time_ref,on='timestep',how='right')
     return mapped
 
 
@@ -83,25 +83,25 @@ def add_time_to_edges(flows,edges):
     ''' Function to add time indices to edge data
     '''
     # Number of timesteps
-    timesteps = flows.Timestep.max()
+    timesteps = flows.timestep.max()
     # add time
-    edges['Timestep'] = 1
+    edges['timestep'] = 1
     #repeat for each timestep
     new_edges = edges.append( [edges]*(timesteps-1) )
     #create time indices in loop
     tt = []
     for i in range(0,timesteps):
-        t = edges.Timestep.to_numpy() + i
+        t = edges.timestep.to_numpy() + i
         tt.append(t)
     tt = np.concatenate(tt,axis=0)
     #add time to pandas datafram
-    new_edges['Timestep'] = tt
+    new_edges['timestep'] = tt
     # reset index
     new_edges = new_edges.reset_index(drop=True)
     # add dates
     new_edges = map_timesteps_to_date(flows,new_edges)
     # reorder
-    col_order = metainfo['edges_header'] + ['Timestep'] + metainfo['flow_header']
+    col_order = metainfo['edges_header'] + ['timestep'] + metainfo['flow_header']
     new_edges = new_edges[col_order]
     return new_edges
 
@@ -116,8 +116,8 @@ def arc_indicies_as_dict(self,var_name):
 def flows_as_dict(flows):
     ''' Convert flows from csv to dict
     '''
-    flows_dict = flows[['Node','Timestep','Value']]
-    flows_dict = flows_dict.set_index(keys=['Node','Timestep']).to_dict()['Value']
+    flows_dict = flows[['Node','timestep','Value']]
+    flows_dict = flows_dict.set_index(keys=['Node','timestep']).to_dict()['Value']
     return flows_dict
 
 
