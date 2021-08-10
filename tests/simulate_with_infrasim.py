@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Aug 10 10:26:04 2021
 
-@author: aqua
+    simulate_with_infrasim.py
+    
+        Script to carry out simulation with infrasim.
+    
+@amanmajid
 """
 
 import sys
@@ -28,7 +31,9 @@ jem = infrasim(nodes,
                flows,
                timesteps=1,
                print_to_console=False,
-               super_source=False,
+               #nodes_to_attack=['node_2009'],
+               #edges_to_attack=['edge_712'],
+               super_source=True,
                super_sink=False)
 
 # build model
