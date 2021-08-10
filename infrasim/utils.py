@@ -11,7 +11,7 @@ import pandas as pd
 import geopandas as gpd
 
 from . import spatial
-from .metainfo import *
+from .meta import *
 from .params import *
 
 
@@ -67,6 +67,7 @@ def tidy(flows):
     tidy = flows.melt(id_vars=id_vars,var_name='Node',value_name='Value')
     return tidy
 
+
 def map_timesteps_to_date(flows,mappable):
     ''' Function to map dates to timesteps
     '''
@@ -76,6 +77,7 @@ def map_timesteps_to_date(flows,mappable):
     # perform merge
     mapped = pd.merge(mappable,time_ref,on='Timestep',how='right')
     return mapped
+
 
 def add_time_to_edges(flows,edges):
     ''' Function to add time indices to edge data
@@ -103,11 +105,13 @@ def add_time_to_edges(flows,edges):
     new_edges = new_edges[col_order]
     return new_edges
 
+
 def arc_indicies_as_dict(self,var_name):
     ''' Function to convert edge indices dataframe to dict
     '''
     asDict = self.edge_indices[self.indices+[var_name]].set_index(keys=self.indices)[var_name].to_dict()
     return asDict
+
 
 def flows_as_dict(flows):
     ''' Convert flows from csv to dict
@@ -116,39 +120,49 @@ def flows_as_dict(flows):
     flows_dict = flows_dict.set_index(keys=['Node','Timestep']).to_dict()['Value']
     return flows_dict
 
-def add_super_source(nodes,edges,commodities):
+
+def add_super_source(nodes,edges):
     ''' Add super source to edges
     '''
+    
     new_edges = []
-    for commodity in commodities:
-        tmp_edges = pd.DataFrame({'Start'       : 'super_source',
-                                  'End'         : nodes.Name.unique(),
-                                  'Commodity'   : commodity,
-                                  'Cost'        : constants['super_source_maximum'],
-                                  'Minimum'     : 0,
-                                  'Maximum'     : constants['super_source_maximum']})
-        new_edges.append(tmp_edges)
+    
+    tmp_edges = pd.DataFrame({'Start'       : 'super_source',
+                              'End'         : nodes.id.unique(),
+                              'Cost'        : constants['super_source_maximum'],
+                              'Minimum'     : 0,
+                              'Maximum'     : constants['super_source_maximum']})
+    
+    new_edges.append(tmp_edges)
+    
     new_edges = pd.concat(new_edges,ignore_index=True)
+    
     return edges.append(new_edges, ignore_index=True)
 
-def add_super_sink(nodes,edges,commodities):
+
+def add_super_sink(nodes,edges):
     ''' Add super sinks to edges
     '''
     new_edges = []
-    for commodity in commodities:
-        tmp_edges = pd.DataFrame({'Start'       : nodes.Name.unique(),
-                                  'End'         : 'super_sink',
-                                  'Commodity'   : commodity,
-                                  'Cost'        : constants['super_source_maximum'],
-                                  'Minimum'     : 0,
-                                  'Maximum'     : constants['super_source_maximum']})
-        new_edges.append(tmp_edges)
+
+    tmp_edges = pd.DataFrame({'Start'       : nodes.id.unique(),
+                              'End'         : 'super_sink',
+                              'Cost'        : constants['super_source_maximum'],
+                              'Minimum'     : 0,
+                              'Maximum'     : constants['super_source_maximum']})
+    
+    new_edges.append(tmp_edges)
+    
     new_edges = pd.concat(new_edges,ignore_index=True)
+    
     return edges.append(new_edges, ignore_index=True)
+
 
 def normalise_column(df_column):
     normalised_column = (df_column-df_column.min()) / (df_column.max()-df_column.min())
     return normalised_column
+
+
 
 #---
 # Look ups

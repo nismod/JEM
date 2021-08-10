@@ -248,6 +248,12 @@ network = add_edge_notation(network)
 
 
 #===
+# REMOVE DUPLICATED
+
+network.edges = network.edges.drop_duplicates(subset=['from_id', 'to_id'], keep='first').reset_index(drop=True)
+
+
+#===
 # SAVE DATA
 
 if demo_run_type is True:

@@ -2,7 +2,7 @@ import geopandas as gpd
 from shapely.geometry import Point
 import snkit
 
-from .metainfo import *
+from .meta import *
 
 def add_graph_topology(nodes,edges,id_attribute='ID',save=False,label=False):
     '''
