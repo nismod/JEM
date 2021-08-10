@@ -22,6 +22,7 @@
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 from shapely.wkt import loads
@@ -253,18 +254,80 @@ network = add_edge_notation(network)
 network.edges = network.edges.drop_duplicates(subset=['from_id', 'to_id'], keep='first').reset_index(drop=True)
 
 
+
 #===
 # ADD MAX/MIN
 
 network.edges['min'] = 0 
 network.edges['max'] = 1.000000e+12
 
+
+
+#===
+# REDUCE SAMPLE
+
+if demo_run_type is True:
+    
+    # get microsample attributes
+    edges_attributes = gpd.read_file('../data/demo/edges_demo_microsample.shp')
+    nodes_attributes = gpd.read_file('../data/demo/nodes_demo_microsample.shp')
+    
+    # copy
+    edges_microsample = network.edges.copy()
+    nodes_microsample = network.nodes.copy()
+    
+    # resample
+    edges_microsample = edges_microsample.loc[edges_microsample.geometry.isin(edges_attributes.geometry)].reset_index(drop=True)
+    nodes_microsample = nodes_microsample.loc[nodes_microsample.geometry.isin(nodes_attributes.geometry)].reset_index(drop=True)
+
+
+
+#===
+# DOUBLE-UP EDGES
+
+def double_edges(edges):
+    ''' Double edge for directionality
+    '''
+    ee = edges.copy()
+    # reverse ids
+    ee['from_id']   = edges['to_id']
+    ee['to_id']     = edges['from_id']
+    # reverse geom
+    for i in ee.index:
+        ee.loc[i,'geometry'] = flip(ee.loc[i].geometry)
+    # append
+    edges = edges.append(ee,ignore_index=True)
+    return edges
+
+network.edges       = double_edges(network.edges)
+edges_microsample   = double_edges(edges_microsample)
+
+print('> Doubled up edges')
+
+
+#===
+# UPDATE NETWORK NOTATION... again
+
+# drop existing
+network.edges.drop(['id','from_id','to_id'],axis=1)
+network.nodes.drop(['id'],axis=1)
+
+# update
+network = add_id_to_nodes(network)
+network = add_edge_notation(network)
+
+
+
 #===
 # SAVE DATA
 
 if demo_run_type is True:
+    # demo
     network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo_processed.shp')
     network.edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_processed.shp')
+    # micrsample
+    nodes_microsample.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo_microsample_processed.shp')
+    edges_microsample.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_microsample_processed.shp')
 else:
     network.nodes.to_file(driver='ESRI Shapefile', filename='../data/spatial/nodes_processed.shp')
     network.edges.to_file(driver='ESRI Shapefile', filename='../data/spatial/edges_processed.shp')

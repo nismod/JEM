@@ -81,8 +81,8 @@ def plot_storage_volume(storage_results,node,**kwargs):
 def plot_inflow_outflow(arcflow_result,node,**kwargs):
     '''Plot nodal inflow and outflows
     '''
-    inflow  = arcflow_result[arcflow_result.End==node].groupby(by='Timestep').sum().reset_index(drop=True)
-    outflow = arcflow_result[arcflow_result.Start==node].groupby(by='Timestep').sum().reset_index(drop=True)
+    inflow  = arcflow_result[arcflow_result.End==node].groupby(by='timestep').sum().reset_index(drop=True)
+    outflow = arcflow_result[arcflow_result.Start==node].groupby(by='timestep').sum().reset_index(drop=True)
 
     grouped = kwargs.get("grouped", True)
 

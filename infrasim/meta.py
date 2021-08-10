@@ -14,7 +14,7 @@ metainfo = {
             'nodes_header'          : ['id','asset_type','subtype','title','capacity'],
             'edges_header'          : ['id','from_id','to_id','length_km','min','max'],
             'flow_header'           : [],
-            'edge_index_variables'  : ['from_id','to_id','Timestep'],
+            'edge_index_variables'  : ['from_id','to_id','timestep'],
             'infrasim_cache'        : '../data/__infrasim__/',
             'outputs_figures'       : '../outputs/figures/',
             'outputs_data'          : '../outputs/statistics/',
