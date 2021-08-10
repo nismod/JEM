@@ -22,6 +22,9 @@ from .params import *
 
 class infrasim():
 
+    
+
+
 
     def __init__(self,nodes,edges,flows,**kwargs):
 
@@ -102,6 +105,23 @@ class infrasim():
         if self._print is False:
             self.model.Params.LogToConsole = 0
         
+        #---
+        # attackable nodes
+        self.nodes_to_attack = kwargs.get('nodes_to_attack',None)
+        self.edges_to_attack = kwargs.get('edges_to_attack',None)
+        
+        # zero edges associated with attackable nodes
+        if self.nodes_to_attack is not None:
+            self.edge_indices.loc[self.edge_indices.from_id.isin(self.nodes_to_attack),'max'] = 0
+            self.edge_indices.loc[self.edge_indices.to_id.isin(self.nodes_to_attack),'max'] = 0
+        
+        # zero attackable edges
+        if self.edges_to_attack is not None:
+            self.edge_indices.loc[self.edge_indices.id.isin(self.edges_to_attack),'max'] = 0
+
+
+
+
 
 
     def build(self,**kwargs):
