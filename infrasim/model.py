@@ -45,8 +45,8 @@ class infrasim():
         # restrict timesteps
         timesteps_restriction = kwargs.get("timesteps", None)
         if timesteps_restriction is not None:
-            flows = flows.loc[(flows.Timestep >= timesteps_restriction) & \
-                              (flows.Timestep <= timesteps_restriction)]
+            flows = flows.loc[(flows.timestep >= timesteps_restriction) & \
+                              (flows.timestep <= timesteps_restriction)]
 
         #---
         # Add super source
@@ -83,7 +83,7 @@ class infrasim():
         self.constants      = constants
         self.node_types     = self.nodes.asset_type.unique().tolist()
         self.technologies   = self.nodes.subtype.unique().tolist()
-        self.timesteps      = self.flows.Timestep.unique().tolist()
+        self.timesteps      = self.flows.timestep.unique().tolist()
 
         #---
         # define gurobi model
@@ -157,37 +157,94 @@ class infrasim():
         #----------------------------------------------------------------------
         # SUPPLY/DEMAND
         #----------------------------------------------------------------------
+        
+        # SUPPLY
+        
+        # get source nodes
+        sources = utils.get_node_names(nodes=self.nodes,
+                                       index_column='asset_type',lookup='source')
+
+        # get flow at water supply nodes
+        flow_dict = utils.get_flow_at_nodes(flows=self.flows,list_of_nodes=sources)
+        flow_dict = utils.flows_as_dict(flows=flow_dict)
+
+        # constrain: supply from source nodes
+        self.model.addConstrs((
+            self.arcFlows.sum(i,'*',t)  == flow_dict[i,t] \
+                for t in self.timesteps \
+                    for i in sources),'supply')
+            
+        # constrain: demand at source nodes
+        self.model.addConstrs((
+            self.arcFlows.sum('*',i,t)  == 0 \
+                for t in self.timesteps \
+                    for i in sources),'supply')
+        
+            
+        # DEMAND
+        
+        # get sink nodes
+        sinks = utils.get_node_names(nodes=self.nodes,
+                                     index_column='asset_type',lookup='sink')
+
+        # get flow at water supply nodes
+        flow_dict = utils.get_flow_at_nodes(flows=self.flows,list_of_nodes=sinks)
+        flow_dict = utils.flows_as_dict(flows=flow_dict)
+
+        # constrain
+        self.model.addConstrs((
+            self.arcFlows.sum('*',i,t)  == flow_dict[i,t] \
+                for t in self.timesteps \
+                    for i in sinks),'demand')
+        
+            
+        # CONSERVATION OF ENERGY
+        
+        self.model.addConstrs((
+            self.arcFlows.sum('*',j,t) - flow_dict[j,t] \
+                == self.arcFlows.sum(j,'*',t) \
+                    for t in self.timesteps \
+                        for j in sinks),'cons_of_energy')
 
 
+        # # #----------------------------------------------------------------------
+        # # # ARC FLOW BOUNDS
+        # # #----------------------------------------------------------------------
 
-        #----------------------------------------------------------------------
-        # ARC FLOW BOUNDS
-        #----------------------------------------------------------------------
+        # # # Flows must be below upper bounds
+        # # upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
+        # # self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
+        # #                        for i,j,t in self.arcFlows),'upper_bound')
 
-        # Flows must be below upper bounds
-        upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
-        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
-                               for i,j,t in self.arcFlows),'upper_bound')
-
-        # Flows must be above lower bounds
-        lower_bound = utils.arc_indicies_as_dict(self,metainfo['lower_bound'])
-        self.model.addConstrs((lower_bound[i,j,t] <= self.arcFlows[i,j,t]
-                               for i,j,t in self.arcFlows),'lower_bound')
+        # # # Flows must be above lower bounds
+        # # lower_bound = utils.arc_indicies_as_dict(self,metainfo['lower_bound'])
+        # # self.model.addConstrs((lower_bound[i,j,t] <= self.arcFlows[i,j,t]
+        # #                        for i,j,t in self.arcFlows),'lower_bound')
 
 
-        #----------------------------------------------------------------------
-        # JUNCTIONS
-        #----------------------------------------------------------------------
+        # #----------------------------------------------------------------------
+        # # ENERGY BALANCE
+        # #----------------------------------------------------------------------
+        
+        # self.model.addConstrs((
+        #          self.arcFlows.sum(i,'*',t)  == self.arcFlows.sum('*',j,t)
+        #                 for t in self.timesteps
+        #                 for i in sources
+        #                 for j in sinks),'energy_balance')
+
+
+        # #----------------------------------------------------------------------
+        # # JUNCTIONS
+        # #----------------------------------------------------------------------
 
         #---
         # Junction node balance
-        if 'junction' in self.node_types:
-            junction_nodes = utils.get_node_names(nodes=self.nodes,index_column='asset_type',lookup='junction')
+        junction_nodes = utils.get_node_names(nodes=self.nodes,index_column='asset_type',lookup='junction')
 
-            self.model.addConstrs((
-                     self.arcFlows.sum('*',j,t)  == self.arcFlows.sum(j,'*',t)
-                            for t in self.timesteps
-                            for j in junction_nodes),'junction_balance')
+        self.model.addConstrs((
+                  self.arcFlows.sum('*',j,t)  == self.arcFlows.sum(j,'*',t)
+                        for t in self.timesteps
+                        for j in junction_nodes),'junc_bal')
             
 
         print(time.process_time() - from_id_time, "seconds")
@@ -218,10 +275,10 @@ class infrasim():
         if self.model.Status == 2:
             # arcFlows
             arcFlows            = self.model.getAttr('x', self.arcFlows)
-            keys                = pd.DataFrame(arcFlows.keys(),columns=['from_id','to_id','Timestep'])
+            keys                = pd.DataFrame(arcFlows.keys(),columns=['from_id','to_id','timestep'])
             vals                = pd.DataFrame(arcFlows.items(),columns=['key','Value'])
             results_arcflows    = pd.concat([keys,vals],axis=1)
-            results_arcflows    = results_arcflows[['from_id','to_id','Timestep','Value']]
+            results_arcflows    = results_arcflows[['from_id','to_id','timestep','Value']]
             # write csv
             results_arcflows.to_csv(metainfo['outputs_data']+'results_arcflows.csv',index=False)
             self.results_arcflows = results_arcflows
