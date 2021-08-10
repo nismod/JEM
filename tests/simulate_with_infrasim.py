@@ -10,21 +10,36 @@ sys.path.append('../')
 
 from infrasim.model import *
 
-# nodes = '../data/demo/nodes_demo_microsample_processed.shp'
-# edges = '../data/demo/edges_demo_microsample_processed.shp'
+#------------------------------------
+# RUN MODEL
 
-nodes = '../data/demo/nodes_demo_processed.shp'
-edges = '../data/demo/edges_demo_processed.shp'
-
+# define input files
 flows = '../data/demo/csv/nodal_flows.csv'
 
+nodes = '../data/demo/nodes_demo_microsample_processed.shp'
+edges = '../data/demo/edges_demo_microsample_processed.shp'
+
+# nodes = '../data/demo/nodes_demo_processed.shp'
+# edges = '../data/demo/edges_demo_processed.shp'
+
 # init model
-jem = infrasim(nodes,edges,flows,
-               timesteps=1,super_source=False,super_sink=False)
+jem = infrasim(nodes,
+               edges,
+               flows,
+               timesteps=1,
+               print_to_console=False,
+               super_source=False,
+               super_sink=False)
 
-
+# build model
 jem.build()
-jem.run()
+
+# run model
+jem.run(print_to_console=True)
+
+
+#------------------------------------
+# PROCESS RESULTS OR DEBUG
 
 try:
     
