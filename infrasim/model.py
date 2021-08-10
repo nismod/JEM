@@ -19,6 +19,7 @@ from .meta import *
 from .params import *
 
 
+
 class infrasim():
 
 
@@ -93,9 +94,17 @@ class infrasim():
         #---
         # define model temporal resolution
         self.temporal_resolution = metainfo['temporal_resolution']
+        
+        #---
+        # print out
+        self._print = kwargs.get('print_to_console',False)
+        
+        if self._print is False:
+            self.model.Params.LogToConsole = 0
+        
 
 
-    def build(self):
+    def build(self,**kwargs):
         '''
 
         Contents:
@@ -128,8 +137,9 @@ class infrasim():
         # Minimise cost of flow
         self.costDict = utils.arc_indicies_as_dict(self,metainfo['cost_column'])
 
-        self.model.setObjectiveN(gp.quicksum(self.arcFlows[i,j,t] * self.costDict[i,j,t]
-                                              for i,j,t in self.arcFlows),0,weight=1)
+        self.model.setObjectiveN(\
+                    gp.quicksum(self.arcFlows[i,j,t] * self.costDict[i,j,t] \
+                            for i,j,t in self.arcFlows),0,weight=1)
 
 
 
@@ -137,32 +147,36 @@ class infrasim():
         # CONSTRAINTS
         #======================================================================
 
-        #----------------------------------------------------------------------
-        # SUPER NODES
-        #----------------------------------------------------------------------
-
+        #---
+        # SUPER SOURCE
+        
         if 'super_source' in self.edges.from_id.unique():
             # constrain
             self.model.addConstrs((
-                            self.arcFlows.sum('super_source','*',t)  <= constants['super_source_maximum']
-                            for t in self.timesteps),'super_source_supply')
-
+                            self.arcFlows.sum('super_source','*',t)  \
+                                <= constants['super_source_maximum'] \
+                                    for t in self.timesteps \
+                                        ),'super_source_supply')
+        
+        
+        #---
+        # SUPER SINK
+        
         if 'super_sink' in self.edges.to_id.unique():
             # constrain
             self.model.addConstrs((
-                            self.arcFlows.sum('*','super_sink',t)  >= 0
-                            for t in self.timesteps),'super_sink_demand')
+                            self.arcFlows.sum('*','super_sink',t)  >= 0 \
+                                for t in self.timesteps \
+                                    ),'super_sink_demand')
         
         
-        #----------------------------------------------------------------------
-        # SUPPLY/DEMAND
-        #----------------------------------------------------------------------
-        
+        #---
         # SUPPLY
         
         # get source nodes
         sources = utils.get_node_names(nodes=self.nodes,
-                                       index_column='asset_type',lookup='source')
+                                       index_column='asset_type',
+                                       lookup='source')
 
         # get flow at water supply nodes
         flow_dict = utils.get_flow_at_nodes(flows=self.flows,list_of_nodes=sources)
@@ -180,7 +194,8 @@ class infrasim():
                 for t in self.timesteps \
                     for i in sources),'supply')
         
-            
+        
+        #---
         # DEMAND
         
         # get sink nodes
@@ -197,72 +212,67 @@ class infrasim():
                 for t in self.timesteps \
                     for i in sinks),'demand')
         
-            
+        
+        #---
         # CONSERVATION OF ENERGY
         
+        # constrain: conservation of energy
         self.model.addConstrs((
             self.arcFlows.sum('*',j,t) - flow_dict[j,t] \
                 == self.arcFlows.sum(j,'*',t) \
                     for t in self.timesteps \
                         for j in sinks),'cons_of_energy')
-
-
-        # # #----------------------------------------------------------------------
-        # # # ARC FLOW BOUNDS
-        # # #----------------------------------------------------------------------
-
-        # # # Flows must be below upper bounds
-        # # upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
-        # # self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
-        # #                        for i,j,t in self.arcFlows),'upper_bound')
-
-        # # # Flows must be above lower bounds
-        # # lower_bound = utils.arc_indicies_as_dict(self,metainfo['lower_bound'])
-        # # self.model.addConstrs((lower_bound[i,j,t] <= self.arcFlows[i,j,t]
-        # #                        for i,j,t in self.arcFlows),'lower_bound')
-
-
-        # #----------------------------------------------------------------------
-        # # ENERGY BALANCE
-        # #----------------------------------------------------------------------
         
-        # self.model.addConstrs((
-        #          self.arcFlows.sum(i,'*',t)  == self.arcFlows.sum('*',j,t)
-        #                 for t in self.timesteps
-        #                 for i in sources
-        #                 for j in sinks),'energy_balance')
-
-
-        # #----------------------------------------------------------------------
-        # # JUNCTIONS
-        # #----------------------------------------------------------------------
-
+        
         #---
-        # Junction node balance
-        junction_nodes = utils.get_node_names(nodes=self.nodes,index_column='asset_type',lookup='junction')
-
+        # JUNCTION BALANCE
+        junction_nodes = utils.get_node_names(nodes=self.nodes,
+                                              index_column='asset_type',lookup='junction')
+        
+        # constrain: flow between junction nodes
         self.model.addConstrs((
                   self.arcFlows.sum('*',j,t)  == self.arcFlows.sum(j,'*',t)
                         for t in self.timesteps
                         for j in junction_nodes),'junc_bal')
-            
 
-        print(time.process_time() - from_id_time, "seconds")
+
+        #---
+        # UPPER FLOW BOUND        
+
+        # Flows must be below upper bounds
+        upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
+        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
+                                for i,j,t in self.arcFlows),'upper_bound')
         
-        print('------------- MODEL BUILD COMPLETE -------------')
+        
+        #---
+        # LOWER FLOW BOUND   
+        
+        # Flows must be above lower bounds
+        lower_bound = utils.arc_indicies_as_dict(self,metainfo['lower_bound'])
+        self.model.addConstrs((lower_bound[i,j,t] <= self.arcFlows[i,j,t]
+                                for i,j,t in self.arcFlows),'lower_bound')
+        
+        
+        if self._print is False:
+            pass
+        else:
+            print(time.process_time() - from_id_time, "seconds")
+            print('------------- MODEL BUILD COMPLETE -------------')
 
 
 
 
 
 
-    def run(self,pprint=True,write=True):
+    def run(self,write=True,**kwargs):
         ''' Function to solve GurobiPy model'''
         # write model to LP
         if write==True:
             self.model.write(metainfo['infrasim_cache']+self.model.ModelName+'.lp')
         # set output flag
-        if pprint==True:
+        if kwargs.get('print_to_console',True) is True:
+            self.model.Params.LogToConsole = 1
             self.model.setParam('OutputFlag', 1)
         else:
             self.model.setParam('OutputFlag', 0)
