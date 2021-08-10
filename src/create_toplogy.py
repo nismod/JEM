@@ -35,7 +35,7 @@ sys.path.append("../../")
 from JEM.snkit.snkit.src.snkit.network import *
 
 ## DEMO?
-demo_run_type = False
+demo_run_type = True
 
 #=======================
 # FUNCTIONS
@@ -252,6 +252,12 @@ network = add_edge_notation(network)
 
 network.edges = network.edges.drop_duplicates(subset=['from_id', 'to_id'], keep='first').reset_index(drop=True)
 
+
+#===
+# ADD MAX/MIN
+
+network.edges['min'] = 0 
+network.edges['max'] = 1.000000e+12
 
 #===
 # SAVE DATA

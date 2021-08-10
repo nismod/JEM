@@ -20,12 +20,4 @@ jem = infrasim(nodes,edges,flows,
 
 
 jem.build()
-
-
-
-df = jem.edges
-
-df = df[df.duplicated(subset=['from_id','to_id'], keep=False)]
-
-
-arc_indicies      = jem.edge_indices[jem.indices].set_index(keys=jem.indices).index.to_list()
+jem.run()

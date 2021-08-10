@@ -38,7 +38,7 @@ class infrasim():
         elif '.csv' in nodes and '.csv' in edges:
             nodes = pd.read_csv(nodes)
             edges = pd.read_csv(edges)
-
+        
         # read flow data
         flows = pd.read_csv(flows)
 
@@ -107,7 +107,7 @@ class infrasim():
 
         '''
 
-        start_time = time.process_time()
+        from_id_time = time.process_time()
 
         #======================================================================
         # VARIABLES
@@ -118,15 +118,6 @@ class infrasim():
         arc_indicies      = self.edge_indices[self.indices].set_index(keys=self.indices).index.to_list()
         self.arcFlows     = self.model.addVars(arc_indicies,name="arcflow")
 
-        #---
-        # storage volumes
-        storage_nodes         = utils.get_nodes(nodes=self.nodes,index_column='Type',lookup='storage')
-
-        storage_indices       = [(n, storage_nodes.loc[storage_nodes.Name==n,'Commodity'].values[0], t)
-                                 for n in storage_nodes.Name
-                                 for t in self.timesteps]
-
-        self.storage_volume   = self.model.addVars(storage_indices,lb=0,name="storage_volume")
 
 
         #======================================================================
@@ -137,8 +128,8 @@ class infrasim():
         # Minimise cost of flow
         self.costDict = utils.arc_indicies_as_dict(self,metainfo['cost_column'])
 
-        self.model.setObjectiveN(gp.quicksum(self.arcFlows[i,j,k,t] * self.costDict[i,j,k,t]
-                                              for i,j,k,t in self.arcFlows),0,weight=1)
+        self.model.setObjectiveN(gp.quicksum(self.arcFlows[i,j,t] * self.costDict[i,j,t]
+                                              for i,j,t in self.arcFlows),0,weight=1)
 
 
 
@@ -150,19 +141,24 @@ class infrasim():
         # SUPER NODES
         #----------------------------------------------------------------------
 
-        if 'super_source' in self.edges.Start.unique():
+        if 'super_source' in self.edges.from_id.unique():
             # constrain
             self.model.addConstrs((
-                            self.arcFlows.sum('super_source','*',k,t)  <= constants['super_source_maximum']
-                            for t in self.timesteps
-                            for k in self.commodities),'super_source_supply')
+                            self.arcFlows.sum('super_source','*',t)  <= constants['super_source_maximum']
+                            for t in self.timesteps),'super_source_supply')
 
-        if 'super_sink' in self.edges.End.unique():
+        if 'super_sink' in self.edges.to_id.unique():
             # constrain
             self.model.addConstrs((
-                            self.arcFlows.sum('*','super_sink',k,t)  >= 0
-                            for t in self.timesteps
-                            for k in self.commodities),'super_sink_demand')
+                            self.arcFlows.sum('*','super_sink',t)  >= 0
+                            for t in self.timesteps),'super_sink_demand')
+        
+        
+        #----------------------------------------------------------------------
+        # SUPPLY/DEMAND
+        #----------------------------------------------------------------------
+
+
 
         #----------------------------------------------------------------------
         # ARC FLOW BOUNDS
@@ -170,55 +166,13 @@ class infrasim():
 
         # Flows must be below upper bounds
         upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
-        self.model.addConstrs((self.arcFlows[i,j,k,t] <= upper_bound[i,j,k,t]
-                               for i,j,k,t in self.arcFlows),'upper_bound')
+        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
+                               for i,j,t in self.arcFlows),'upper_bound')
 
         # Flows must be above lower bounds
         lower_bound = utils.arc_indicies_as_dict(self,metainfo['lower_bound'])
-        self.model.addConstrs((lower_bound[i,j,k,t] <= self.arcFlows[i,j,k,t]
-                               for i,j,k,t in self.arcFlows),'lower_bound')
-
-        #----------------------------------------------------------------------
-        # WATER SUPPLY
-        #----------------------------------------------------------------------
-
-        #---
-        # Supply from water source nodes
-        if 'water' in self.commodities:
-            # get water supply nodes
-            water_nodes = utils.get_node_names(nodes=self.nodes,
-                                               index_column='Type',lookup='source',
-                                               index_column2='Nodal_Flow',lookup2='True',
-                                               index_column3='Commodity',lookup3='water')
-
-            # get flow at water supply nodes
-            water_flows  = utils.get_flow_at_nodes(flows=self.flows,list_of_nodes=water_nodes)
-            supply_dict  = utils.flows_as_dict(flows=water_flows)
-
-            # constrain
-            self.model.addConstrs((
-                            self.arcFlows.sum(i,'*','water',t)  <= supply_dict[i,t]
-                            for t in self.timesteps
-                            for i in water_nodes),'water_supply')
-
-        #---
-        # Demand at sink nodes
-        if 'water' in self.commodities:
-            # get water demand nodes
-            water_nodes = utils.get_node_names(nodes=self.nodes,
-                                               index_column='Type',lookup='sink',
-                                               index_column2='Nodal_Flow',lookup2='True',
-                                               index_column3='Commodity',lookup3='water')
-
-            # get flow at water supply nodes
-            water_flows  = utils.get_flow_at_nodes(flows=self.flows,list_of_nodes=water_nodes)
-            demand_dict  = utils.flows_as_dict(flows=water_flows)
-
-            # constrain
-            self.model.addConstrs((
-                            self.arcFlows.sum('*',j,'water',t)  == demand_dict[j,t]
-                            for t in self.timesteps
-                            for j in water_nodes),'water_demand')
+        self.model.addConstrs((lower_bound[i,j,t] <= self.arcFlows[i,j,t]
+                               for i,j,t in self.arcFlows),'lower_bound')
 
 
         #----------------------------------------------------------------------
@@ -228,15 +182,16 @@ class infrasim():
         #---
         # Junction node balance
         if 'junction' in self.node_types:
-            junction_nodes = utils.get_node_names(nodes=self.nodes,index_column='Type',lookup='junction')
+            junction_nodes = utils.get_node_names(nodes=self.nodes,index_column='asset_type',lookup='junction')
 
-            for k in self.commodities:
-                self.model.addConstrs((
-                         self.arcFlows.sum('*',j,k,t)  == self.arcFlows.sum(j,'*',k,t)
-                                for t in self.timesteps
-                                for j in junction_nodes),'junction_balance')
+            self.model.addConstrs((
+                     self.arcFlows.sum('*',j,t)  == self.arcFlows.sum(j,'*',t)
+                            for t in self.timesteps
+                            for j in junction_nodes),'junction_balance')
+            
 
-        print(time.clock() - start_time, "seconds")
+        print(time.process_time() - from_id_time, "seconds")
+        
         print('------------- MODEL BUILD COMPLETE -------------')
 
 
@@ -263,23 +218,13 @@ class infrasim():
         if self.model.Status == 2:
             # arcFlows
             arcFlows            = self.model.getAttr('x', self.arcFlows)
-            keys                = pd.DataFrame(arcFlows.keys(),columns=['Start','End','Commodity','Timestep'])
+            keys                = pd.DataFrame(arcFlows.keys(),columns=['from_id','to_id','Timestep'])
             vals                = pd.DataFrame(arcFlows.items(),columns=['key','Value'])
             results_arcflows    = pd.concat([keys,vals],axis=1)
-            results_arcflows    = results_arcflows[['Start','End','Commodity','Timestep','Value']]
+            results_arcflows    = results_arcflows[['from_id','to_id','Timestep','Value']]
             # write csv
             results_arcflows.to_csv(metainfo['outputs_data']+'results_arcflows.csv',index=False)
             self.results_arcflows = results_arcflows
-
-            # storageVolumes
-            storage_volumes              = self.model.getAttr('x', self.storage_volume)
-            keys                         = pd.DataFrame(storage_volumes.keys(),columns=['Node','Commodity','Timestep'])
-            vals                         = pd.DataFrame(storage_volumes.items(),columns=['key','Value'])
-            results_storage_volumes      = pd.concat([keys,vals],axis=1)
-            results_storage_volumes      = results_storage_volumes[['Node','Commodity','Timestep','Value']]
-            self.results_storage_volumes = results_storage_volumes
-            # write csv
-            results_storage_volumes.to_csv(metainfo['outputs_data']+'results_storage_volumes.csv',index=False)
 
 
 
@@ -299,28 +244,6 @@ class infrasim():
 
 
     def postprocess(self):
-        ''' Post processing of results '''
-
-        utils.create_dir(path=metainfo['outputs_figures'])
-
-        #----------------------------------------------------------------------
-        # GRAPH ANALYSIS
-        #----------------------------------------------------------------------
-
-        #---
-        # Arc utilisation
-        for k in self.commodities:
-            plt.figure(figsize=(10,8))
-            w = self.results_arcflows.loc[self.results_arcflows.Commodity==k].reset_index(drop=True)
-            w = w.groupby(by=['Start','End']).sum().reset_index()
-            w.Value = w.Value / w.Value.sum()
-
-            if k=='water':
-                edge_color='blue'
-            elif k=='electricity':
-                edge_color='red'
-            else:
-                edge_color='black'
-
-            G = plotting.results_to_graph(w,edge_color=edge_color)
-            plt.savefig(metainfo['outputs_figures']+'arc_utilisation_'+k+'.pdf')
+        ''' Post processing of results 
+        '''
+        print('to do')
