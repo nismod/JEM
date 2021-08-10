@@ -127,11 +127,11 @@ def add_super_source(nodes,edges):
     
     new_edges = []
     
-    tmp_edges = pd.DataFrame({'Start'       : 'super_source',
-                              'End'         : nodes.id.unique(),
-                              'Cost'        : constants['super_source_maximum'],
-                              'Minimum'     : 0,
-                              'Maximum'     : constants['super_source_maximum']})
+    tmp_edges = pd.DataFrame({'from_id'     : 'super_source',
+                              'to_id'       : nodes.id.unique(),
+                              'length_km'   : constants['super_source_maximum'],
+                              'min'         : 0,
+                              'max'         : constants['super_source_maximum']})
     
     new_edges.append(tmp_edges)
     
@@ -145,11 +145,11 @@ def add_super_sink(nodes,edges):
     '''
     new_edges = []
 
-    tmp_edges = pd.DataFrame({'Start'       : nodes.id.unique(),
-                              'End'         : 'super_sink',
-                              'Cost'        : constants['super_source_maximum'],
-                              'Minimum'     : 0,
-                              'Maximum'     : constants['super_source_maximum']})
+    tmp_edges = pd.DataFrame({'from_id'     : nodes.id.unique(),
+                              'to_id'       : 'super_sink',
+                              'length_km'   : constants['super_source_maximum'],
+                              'min'         : 0,
+                              'max'         : constants['super_source_maximum']})
     
     new_edges.append(tmp_edges)
     
@@ -181,18 +181,20 @@ def get_nodes(nodes,index_column,lookup,index_column2=None,lookup2=None,index_co
         idx_nodes = nodes.loc[(nodes[index_column]==lookup)]
     return idx_nodes
 
+
 def get_node_names(nodes,index_column,lookup,index_column2=None,lookup2=None,index_column3=None,lookup3=None):
     ''' Get nodes of particular type and sector '''
     if index_column2 is not None and index_column3 is not None:
         idx_nodes = nodes.loc[(nodes[index_column]==lookup) & \
                               (nodes[index_column2]==lookup2) & \
-                              (nodes[index_column3]==lookup3)].Name.to_list()
+                              (nodes[index_column3]==lookup3)].id.to_list()
     elif index_column2 is not None:
         idx_nodes = nodes.loc[(nodes[index_column]==lookup) & \
-                              (nodes[index_column2]==lookup2)].Name.to_list()
+                              (nodes[index_column2]==lookup2)].id.to_list()
     else:
-        idx_nodes = nodes.loc[(nodes[index_column]==lookup)].Name.to_list()
+        idx_nodes = nodes.loc[(nodes[index_column]==lookup)].id.to_list()
     return idx_nodes
+
 
 def get_flow_at_nodes(flows,list_of_nodes):
     ''' Get flows of specific nodes
