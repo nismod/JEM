@@ -23,10 +23,6 @@ import geopandas as gpd
 import random
 
 
-#=======================
-# FUNCTIONS
-
-
 
 #=======================
 # READ DATA
