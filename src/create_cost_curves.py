@@ -16,7 +16,7 @@ import numpy as np
 
 def return_interp1(x,y,data):
     # create x-array
-    xx = np.linspace(0,120,100)
+    xx = np.linspace(0,120,13)
     # interpolate for each x-value
     yy = [np.interp(i,data[x],data[y]) for i in xx]
     # return
@@ -24,7 +24,7 @@ def return_interp1(x,y,data):
 
 def return_interp2(x,y,data):
     # create x-array
-    xx = np.linspace(0,5,100)
+    xx = np.linspace(0,5,11)
     # interpolate for each x-value
     yy = [np.interp(i,data[x],data[y]) for i in xx]
     # return
@@ -84,7 +84,7 @@ outputs['power_plant_ds1'] = y4
 # add assets we ignore
 outputs['wind_farm']    = 0
 outputs['hydro_plant']  = 0
-outputs['solar_farm']   = 'TODO'
+outputs['solar_farm']   = ''
 
 # save
 outputs.to_csv('../data/costs_and_damages/wind_speed_electricity.csv',index=False)
@@ -116,7 +116,7 @@ outputs['power_plant'] = y
 
 # add assets we ignore
 outputs['wind_farm']        = 0
-outputs['hydro_plant']      = 'TODO'
+outputs['hydro_plant']      = ''
 outputs['solar_farm']       = 0
 outputs['transmission']     = 0
 
