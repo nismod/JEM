@@ -80,6 +80,15 @@ def flip(line):
     return LineString(reversed(line.coords))
 
 
+# update network notation
+def update_notation(network):
+    # drop existing
+    network.edges.drop(['id','from_id','to_id'],axis=1)
+    network.nodes.drop(['id'],axis=1)
+    # update
+    network = add_id_to_nodes(network)
+    network = add_edge_notation(network)
+    return network
 
 #=======================
 # PRE-PROCESSING
@@ -237,14 +246,7 @@ network.edges['length_km'] = network.edges.geometry.length * 10**-3
 
 #===
 # UPDATE NETWORK NOTATION
-
-# drop existing
-network.edges.drop(['id','from_id','to_id'],axis=1)
-network.nodes.drop(['id'],axis=1)
-
-# update
-network = add_id_to_nodes(network)
-network = add_edge_notation(network)
+network = update_notation(network)
 
 
 
@@ -304,20 +306,80 @@ edges_microsample   = bidirectional_edges(edges_microsample)
 
 print('> Doubled up edges')
 
+# Update network notation... again
+network = update_notation(network)
+
+
 
 #===
-# UPDATE NETWORK NOTATION... again
+# ADD EDGE FROM_TYPE,TO_TYPE
 
-# drop existing
-network.edges.drop(['id','from_id','to_id'],axis=1)
-network.nodes.drop(['id'],axis=1)
-
-# update
-network = add_id_to_nodes(network)
-network = add_edge_notation(network)
+nodal_keys = network.nodes[['id','asset_type']].set_index('id')['asset_type'].to_dict()
+network.edges['from_type']  = network.edges['from_id'].map(nodal_keys)
+network.edges['to_type']    = network.edges['to_id'].map(nodal_keys)
 
 
 
+#===
+# REMOVE ISLANDED ASSETS
+
+# remove sink-to-sink connections
+sink_to_sink = network.edges.loc[\
+                    (network.edges.from_type == 'sink') & \
+                        (network.edges.to_type== 'sink')].reset_index(drop=True)
+
+nodes_to_remove = sink_to_sink.from_id.to_list() + sink_to_sink.to_id.to_list()
+edges_to_remove = sink_to_sink.id.to_list() 
+
+#network.nodes = network.nodes.loc[~network.nodes.id.isin(nodes_to_remove)].reset_index(drop=True)
+network.edges = network.edges.loc[~network.edges.id.isin(edges_to_remove)].reset_index(drop=True)
+
+# add node degree
+network.nodes['degree'] = network.nodes.id.apply(lambda x: node_connectivity_degree(x,network=network))
+
+# drop zero degree sinks
+idx = network.nodes.loc[(network.nodes.degree == 0) & \
+                        (network.nodes.asset_type == 'sink')].index
+
+network.nodes = network.nodes.drop(idx).reset_index(drop=True)
+
+# change asset_type of sinks with >2 degree connectivity
+network.nodes.loc[(network.nodes.degree > 2) & \
+                  (network.nodes.asset_type == 'sink'), 'asset_type'] = 'junction'
+
+#===
+# ADJUST COLUMN ATTRIBUTES
+
+#---
+# edges: 
+#   [asset_type,type,from_id,to_id,from_type,to_type,voltage,losses,length_km,min,max,name,parish,source]
+
+
+# append cost_per_km
+
+# reindex
+network.edges = network.edges[['id','asset_type','from_id','to_id','from_type','to_type',\
+                               'voltage','losses','length_km','min','max',\
+                                   'name','parish','source','geometry']]
+
+#---
+# nodes:
+#   [asset_type,type,subtype,capacity,unit_cost,cost_uom,degree,name,parish,source]
+
+
+# reindex
+network.nodes['unit_cost']  = 0
+network.nodes['cost_uom']   = 'USD/MW'
+network.nodes['name']      = network.nodes['title']
+
+network.nodes = network.nodes[['id','asset_type','subtype','capacity',\
+                                'unit_cost','cost_uom','degree',\
+                                    'name','parish','source','geometry']]
+
+# Update network notation... again
+network = update_notation(network)
+
+    
 #===
 # SAVE DATA
 
@@ -334,3 +396,13 @@ else:
 
 
 print('> Saved data to /data/demo/')
+
+
+#===
+# TEST DATA
+
+network.nodes = network.nodes.loc[(network.nodes.degree > 0) & \
+                                  (network.nodes.asset_type == 'sink')].reset_index(drop=True)
+
+
+network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_test.shp')
