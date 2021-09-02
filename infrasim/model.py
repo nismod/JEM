@@ -204,7 +204,7 @@ class infrasim():
 
         # constrain: supply from source nodes
         self.model.addConstrs((
-            self.arcFlows.sum(i,'*',t)  == flow_dict[i,t] \
+            self.arcFlows.sum(i,'*',t)  <= flow_dict[i,t] \
                 for t in self.timesteps \
                     for i in sources),'supply')
             
@@ -261,7 +261,7 @@ class infrasim():
 
         # Flows must be below upper bounds
         upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
-        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
+        self.model.addConstrs((self.arcFlows[i,j,t] <= 9999
                                 for i,j,t in self.arcFlows),'upper_bound')
         
         
