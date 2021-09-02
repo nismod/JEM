@@ -82,7 +82,7 @@ supply_nodes = nodes.loc[nodes.asset_type.isin(['source']),'id'].to_list()
 demand_nodes = nodes.loc[nodes.asset_type.isin(['sink']),'id'].to_list()
 
 # supply
-flow_nodes[supply_nodes] = 9999
+flow_nodes[supply_nodes] = 9999999
 
 # demand
 for c in demand_nodes:
