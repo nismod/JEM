@@ -30,5 +30,26 @@ edges_as_list = [(edges.loc[i].from_id,
 G.add_weighted_edges_from(edges_as_list)
 
 #------
+# Get isolated subgraphs
+
+# get connected_components
+connected_parts = sorted(nx.connected_components(G), key = len, reverse=True)
+
+# tag each individual network
+count = 1
+edges['nx_part'] = 0
+for part in connected_parts:
+    
+    edges.loc[ (edges.from_id.isin(list(part))) | \
+               (edges.to_id.isin(list(part))), 'nx_part' ] = count
+        
+    count = count + 1
+
+nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_demo_processed.shp')
+edges.to_file(driver='ESRI Shapefile', filename='../data/demo/edges_demo_processed.shp')
+
+#------
 # Shortest path setup
-#   TO DO
+#   TO DO 
+
+

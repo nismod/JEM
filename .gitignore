@@ -2,3 +2,6 @@ _archived/*
 documents/*
 data/*
 snkit/*
+outputs/statistics/results_arcflows.csv
+outputs/statistics/results_arcflows.csv
+test.csv
