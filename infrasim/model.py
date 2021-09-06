@@ -23,9 +23,6 @@ from .params import *
 class infrasim():
 
     
-
-
-
     def __init__(self,nodes,edges,flows,**kwargs):
 
         #---
@@ -118,10 +115,6 @@ class infrasim():
         # zero attackable edges
         if self.edges_to_attack is not None:
             self.edge_indices.loc[self.edge_indices.id.isin(self.edges_to_attack),'max'] = 0
-
-
-
-
 
 
     def build(self,**kwargs):
@@ -281,10 +274,6 @@ class infrasim():
             print('------------- MODEL BUILD COMPLETE -------------')
 
 
-
-
-
-
     def run(self,write=True,**kwargs):
         ''' Function to solve GurobiPy model'''
         # write model to LP
@@ -314,20 +303,12 @@ class infrasim():
             self.results_arcflows = results_arcflows
 
 
-
-
-
-
     def debug(self,output_path=''):
         '''
         Compute model Irreducible Inconsistent Subsystem (IIS) to help deal with infeasibilies
         '''
         self.model.computeIIS()
         self.model.write(metainfo['infrasim_cache']+'model-debug-report.ilp')
-
-
-
-
 
 
     def postprocess(self):
