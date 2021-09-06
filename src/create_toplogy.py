@@ -32,6 +32,9 @@ import re
 import sys
 sys.path.append("../../")
 
+# Import infrasim spatial tools
+from JEM.infrasim.spatial import get_isolated_graphs
+
 # Import local copy of snkit
 from JEM.snkit.snkit.src.snkit.network import *
 
@@ -64,6 +67,11 @@ def add_id_to_nodes(network):
     network.nodes['id'] = ids
     return network
 
+def add_id_to_edges(network):
+    ids = ['edge_' + str(i+1) for i in range(len(network.edges))]
+    network.edges['id'] = ids
+    return network
+
 # Add i,j notation to edges
 def add_edge_notation(network):
     i_field = 'from_id'
@@ -87,6 +95,7 @@ def update_notation(network):
     network.nodes.drop(['id'],axis=1)
     # update
     network = add_id_to_nodes(network)
+    network = add_id_to_edges(network)
     network = add_edge_notation(network)
     return network
 
@@ -109,6 +118,9 @@ nodes = gpd.read_file(path_to_nodes)
 #---
 # Edges pre-processing
 
+# delete NoneType
+edges = edges.loc[edges.is_valid].reset_index(drop=True)
+
 # get edges representing HV system
 edges_hv = edges
 
@@ -118,7 +130,7 @@ edges_hv = edges_hv.explode()
 #---
 # Nodes pre-processing
 
-# delete Noneasset_types
+# delete NoneType
 nodes = nodes[~nodes.geometry.isna()].reset_index(drop=True)
 
 
@@ -318,6 +330,7 @@ nodal_keys = network.nodes[['id','asset_type']].set_index('id')['asset_type'].to
 network.edges['from_type']  = network.edges['from_id'].map(nodal_keys)
 network.edges['to_type']    = network.edges['to_id'].map(nodal_keys)
 
+print('> Added from_type,to_type notation to edges')
 
 
 #===
@@ -347,6 +360,9 @@ network.nodes = network.nodes.drop(idx).reset_index(drop=True)
 network.nodes.loc[(network.nodes.degree > 2) & \
                   (network.nodes.asset_type == 'sink'), 'asset_type'] = 'junction'
 
+print('> Removed islanded assets')
+    
+    
 #===
 # ADJUST COLUMN ATTRIBUTES
 
@@ -379,7 +395,34 @@ network.nodes = network.nodes[['id','asset_type','subtype','capacity',\
 # Update network notation... again
 network = update_notation(network)
 
+print('> Adjusted column attributes')
+
     
+#===
+# ADD SUBGRAPH TAG AND REMOVE SMALL SUBGRAPHS
+
+# tag
+network.nodes,network.edges = get_isolated_graphs(network.nodes,network.edges)
+
+# get small graphs
+subgraph_tolerance = 1
+small_graphs = network.edges.loc[network.edges.nx_part > subgraph_tolerance]
+
+# get index
+nodes_to_remove = small_graphs.from_id.to_list() + small_graphs.to_id.to_list()
+edges_to_remove = small_graphs.id.to_list() 
+
+# drop
+network.nodes = network.nodes.loc[~network.nodes.id.isin(nodes_to_remove)].reset_index(drop=True)
+network.edges = network.edges.loc[~network.edges.id.isin(edges_to_remove)].reset_index(drop=True)
+
+# Update network notation... again
+network = update_notation(network)
+
+print('> Removed small subgraphs with ' + str(subgraph_tolerance) + ' tolerance')
+
+
+
 #===
 # SAVE DATA
 
@@ -398,11 +441,11 @@ else:
 print('> Saved data to /data/demo/')
 
 
-#===
-# TEST DATA
+# #===
+# # TEST DATA
 
-network.nodes = network.nodes.loc[(network.nodes.degree > 0) & \
-                                  (network.nodes.asset_type == 'sink')].reset_index(drop=True)
+# network.nodes = network.nodes.loc[(network.nodes.degree > 0) & \
+#                                   (network.nodes.asset_type == 'sink')].reset_index(drop=True)
 
 
-network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_test.shp')
+# network.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/nodes_test.shp')
