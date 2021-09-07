@@ -5,3 +5,4 @@ snkit/*
 outputs/statistics/results_arcflows.csv
 outputs/statistics/results_arcflows.csv
 test.csv
+_gpkg/electricity_networkv_v1.0.gpkg
