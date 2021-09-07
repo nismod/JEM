@@ -54,8 +54,8 @@ try:
     #---
     # Export results to GIS
     
-    edges = gpd.read_file(path_to_nodes)
-    nodes = gpd.read_file(path_to_edges)
+    edges = gpd.read_file(path_to_edges)
+    nodes = gpd.read_file(path_to_nodes)
     
     # concat
     rr = pd.concat([edges,r],axis=1).sort_values(by='id')
