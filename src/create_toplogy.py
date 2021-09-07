@@ -39,7 +39,7 @@ from JEM.infrasim.spatial import get_isolated_graphs
 from JEM.snkit.snkit.src.snkit.network import *
 
 ## DEMO?
-demo_run_type = True
+demo_run_type = False
 
 #=======================
 # FUNCTIONS
@@ -52,13 +52,17 @@ simpledec = re.compile(r"\d*\.\d+")
 # Merge edges in raw data
 def jem_merge_edges(network):
     # add endpoints
+    print('1...')
     network = add_endpoints(network) 
     # add ids
+    print('2...')
     network = add_ids(network)
     # add topology
+    print('3...')
     network = add_topology(network, id_col='id')
     # merge using snkit
-    network = merge_edges(network,by='asset_type')
+    print('4...')
+    #network = merge_edges(network,by='asset_type')
     return network.edges
 
 # Add ID attribute to nodes
@@ -121,11 +125,8 @@ nodes = gpd.read_file(path_to_nodes)
 # delete NoneType
 edges = edges.loc[edges.is_valid].reset_index(drop=True)
 
-# get edges representing HV system
-edges_hv = edges
-
 # explode multipart linestrings
-edges_hv = edges_hv.explode()
+edges = edges.explode()
 
 #---
 # Nodes pre-processing
@@ -133,13 +134,14 @@ edges_hv = edges_hv.explode()
 # delete NoneType
 nodes = nodes[~nodes.geometry.isna()].reset_index(drop=True)
 
+print('> Pre-processed node,edge data')
 
 
 #=======================
 # PROCESSING
 
 # Define network
-network = Network(nodes,edges_hv)
+network = Network(nodes,edges)
 
 # save jps nodes
 jps_nodes = network.nodes.copy()
@@ -149,16 +151,16 @@ jps_nodes = network.nodes.copy()
 
 # Merge edges in raw data
 network.edges = jem_merge_edges(network)
+print('> Merged edges in raw data')
 
 # merge multilinestrings
 network.edges.geometry = network.edges.geometry.apply(merge_multilinestring)
+print('> Merged Multilinestrings')
 
-# [!!!]
+# [!!! FIX THIS AT SOME POINT !!!]
 # remove any remaining multilinestrings
 network.edges = network.edges.loc[network.edges.geom_type != 'MultiLineString'].reset_index(drop=True)
-
-print('> Removed Multilinestrings')
-
+print('> Removed remaining Multilinestrings')
 
 
 #===
@@ -314,12 +316,14 @@ def bidirectional_edges(edges):
     return edges
 
 network.edges       = bidirectional_edges(network.edges)
-edges_microsample   = bidirectional_edges(edges_microsample)
+
+if demo_run_type is True:
+    edges_microsample   = bidirectional_edges(edges_microsample)
 
 print('> Doubled up edges')
 
 # Update network notation... again
-network = update_notation(network)
+# network = update_notation(network)
 
 
 
@@ -393,7 +397,7 @@ network.nodes = network.nodes[['id','asset_type','subtype','capacity',\
                                     'name','parish','source','geometry']]
 
 # Update network notation... again
-network = update_notation(network)
+# network = update_notation(network)
 
 print('> Adjusted column attributes')
 
@@ -405,7 +409,7 @@ print('> Adjusted column attributes')
 network.nodes,network.edges = get_isolated_graphs(network.nodes,network.edges)
 
 # get small graphs
-subgraph_tolerance = 1
+subgraph_tolerance = 99999999
 small_graphs = network.edges.loc[network.edges.nx_part > subgraph_tolerance]
 
 # get index
