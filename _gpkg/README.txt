@@ -19,6 +19,15 @@ Overview:
 Versions:
 --------
 
+	VERSION 0.2
+		- Added unit cost data
+		- Known issues:
+			1. Topology around substations is incorrect in parts
+			2. Some multilinestring data is not being properly processed by snkit functions
+			   and is hence dropped from the dataset
+			3. Supply and demand has not yet been mapped 
+
+
 	VERSION 0.1
 		- Network topology refined using JEM/src/create_topology.py and manual cleaning
 		- Network components were combined to create a single topology
@@ -42,6 +51,7 @@ Versions:
 
 Future releases:
 --------
+
 The following features will be incorporated in the next release (minor revisions):
 	- Topology around substations to be fixed
 	- Unit costs to be incorporated into node and edge data
