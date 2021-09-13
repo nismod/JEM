@@ -19,11 +19,17 @@ from infrasim.model import *
 # define input files
 flows = '../data/demo/csv/nodal_flows.csv'
 
-# nodes = '../data/demo/nodes_demo_microsample_processed.shp'
-# edges = '../data/demo/edges_demo_microsample_processed.shp'
+# '../data/demo/nodes_demo_microsample_processed.shp'
+# '../data/demo/edges_demo_microsample_processed.shp'
 
-path_to_nodes = '../data/demo/nodes_demo_processed.shp'
-path_to_edges = '../data/demo/edges_demo_processed.shp'
+# '../data/demo/nodes_demo_processed.shp'
+# '../data/demo/edges_demo_processed.shp'
+
+# '../data/spatial/nodes_processed.shp'
+# '../data/spatial/edges_processed.shp'
+
+path_to_nodes = '../data/spatial/nodes_processed.shp'
+path_to_edges = '../data/spatial/edges_processed.shp'
 
 # init model
 jem = infrasim(path_to_nodes,

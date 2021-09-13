@@ -137,8 +137,8 @@ class infrasim():
 
         #---
         # arcflows
-        arc_indicies      = self.edge_indices[self.indices].set_index(keys=self.indices).index.to_list()
-        self.arcFlows     = self.model.addVars(arc_indicies,name="arcflow")
+        self.arc_indicies = set(self.edge_indices[self.indices].set_index(keys=self.indices).index.to_list())
+        self.arcFlows     = self.model.addVars(self.arc_indicies,name="arcflow")
 
 
 

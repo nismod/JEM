@@ -28,11 +28,18 @@ import random
 # READ DATA
 
 # File paths
-# path_to_edges = '../data/demo/edges_demo_microsample_processed.shp'
-# path_to_nodes = '../data/demo/nodes_demo_microsample_processed.shp'
 
-path_to_edges = '../data/demo/edges_demo_processed.shp'
-path_to_nodes = '../data/demo/nodes_demo_processed.shp'
+# '../data/demo/nodes_demo_microsample_processed.shp'
+# '../data/demo/edges_demo_microsample_processed.shp'
+
+# '../data/demo/nodes_demo_processed.shp'
+# '../data/demo/edges_demo_processed.shp'
+
+# '../data/spatial/nodes_processed.shp'
+# '../data/spatial/edges_processed.shp'
+
+path_to_nodes = '../data/spatial/nodes_processed.shp'
+path_to_edges = '../data/spatial/edges_processed.shp'
 
 # Read edges and nodes
 edges = gpd.read_file(path_to_edges)
@@ -82,7 +89,7 @@ supply_nodes = nodes.loc[nodes.asset_type.isin(['source']),'id'].to_list()
 demand_nodes = nodes.loc[nodes.asset_type.isin(['sink']),'id'].to_list()
 
 # supply
-flow_nodes[supply_nodes] = 9999999
+flow_nodes[supply_nodes] = 99999999999
 
 # demand
 for c in demand_nodes:
