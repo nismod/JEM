@@ -409,7 +409,7 @@ print('> Adjusted column attributes')
 network.nodes,network.edges = get_isolated_graphs(network.nodes,network.edges)
 
 # get small graphs
-subgraph_tolerance = 99999999
+subgraph_tolerance = 1 #99999999
 small_graphs = network.edges.loc[network.edges.nx_part > subgraph_tolerance]
 
 # get index
@@ -426,12 +426,13 @@ network = update_notation(network)
 print('> Removed small subgraphs with ' + str(subgraph_tolerance) + ' tolerance')
 
 
-
 #===
-# COMBINE WITH COST DATA
+# REMOVE SELF-LOOPS
 
+network.edges = network.edges[network.edges.from_id != network.edges.to_id].reset_index(drop=True)
 
-
+# Update network notation... again
+network = update_notation(network)
 
 
 #===
