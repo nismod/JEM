@@ -24,33 +24,63 @@ def kwh_to_gwh(v):
     '''
     return v*0.000001
 
+
 def gwh_to_kwh(v):
     '''Gigawatt hours to Kilowatt hours
     '''
     return v/0.000001
+
 
 def cmd_to_mld(v):
     '''Cubic meters per day to megalitres per day
     '''
     return v/0.001
 
+
 def mld_to_cmd(v):
     '''Megalitres per day to cubic meters per day
     '''
     return v*0.001
+
 
 def lps_to_cmps(v):
     '''Litres per second to cubic meters per second
     '''
     return v*0.001
 
+
 def seconds_to_hours(v):
     '''Convert seconds to hours
     '''
     return v*3600
 
+
+
+
 #---
-# Functions
+# Post-processing
+#---
+
+def get_super_source_flows(jem):
+        '''Return nodes that are supplied by super_source
+        '''
+        return list(jem.results_arcflows[(jem.results_arcflows.from_id == 'super_source') \
+                                         & (jem.results_arcflows.Value > 0)].to_id) 
+
+
+def tag_super_source_flows(jem):
+    '''Tag nodes that are supplied by super_source
+    '''
+    n = get_super_source_flows(jem)
+    jem.nodes['super_source'] = False
+    jem.nodes.loc[jem.nodes.id.isin(n),'super_source'] = True
+    return jem
+
+
+##
+
+#---
+# Pre-processing (messy code...)
 #---
 
 def create_dir(path):
