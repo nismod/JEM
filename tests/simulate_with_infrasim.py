@@ -79,6 +79,7 @@ try:
     # edges.to_file(driver='ESRI Shapefile', filename='../data/demo/model_results.shp')
     
 except:
-    jem.debug()
+    print('simulation failed')
+    #jem.debug()
     
 

@@ -134,6 +134,9 @@ edges = edges.explode()
 # delete NoneType
 nodes = nodes[~nodes.geometry.isna()].reset_index(drop=True)
 
+# remove buggy edges
+edges = edges[edges.bug != 'true'].reset_index(drop=True)
+
 print('> Pre-processed node,edge data')
 
 
@@ -429,6 +432,7 @@ print('> Removed small subgraphs with ' + str(subgraph_tolerance) + ' tolerance'
 #===
 # REMOVE SELF-LOOPS
 
+# self-loops
 network.edges = network.edges[network.edges.from_id != network.edges.to_id].reset_index(drop=True)
 
 # Update network notation... again
