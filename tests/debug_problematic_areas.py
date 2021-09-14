@@ -34,4 +34,5 @@ joined_df = sjoin(edges, raw_edges, how="left")
 
 
 # save
+nodes.to_file(driver='ESRI Shapefile', filename='../_tmp/node_debugging.shp')
 joined_df.to_file(driver='ESRI Shapefile', filename='../_tmp/edge_debugging.shp')
