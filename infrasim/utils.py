@@ -56,16 +56,22 @@ def seconds_to_hours(v):
 
 
 
-
 #---
 # Post-processing
 #---
 
-def get_super_source_flows(jem):
+def get_super_source_flows(jem,as_list=True):
         '''Return nodes that are supplied by super_source
         '''
-        return list(jem.results_arcflows[(jem.results_arcflows.from_id == 'super_source') \
-                                         & (jem.results_arcflows.Value > 0)].to_id) 
+        if as_list is True:
+            return list(jem.results_arcflows[ \
+                            (jem.results_arcflows.from_id == 'super_source') & \
+                            (jem.results_arcflows.Value > 0)].to_id
+                        )
+        else:
+            return jem.results_arcflows[ \
+                            (jem.results_arcflows.from_id == 'super_source') & \
+                            (jem.results_arcflows.Value > 0)].to_id
 
 
 def tag_super_source_flows(jem):
@@ -86,6 +92,44 @@ def merge_edges_with_flows(jem):
         edges = edges.drop(['timestep'],axis=1)
     #merge
     return edges.merge(results,on=['from_id','to_id'])
+
+
+def flows_to_shapefile(jem,filename,driver='ESRI Shapefile',timestep=1):
+    '''Export optimal flow results to shapefile
+    '''
+    results = merge_edges_with_flows(jem)
+    results.to_file(driver='ESRI Shapefile',filename=filename)
+
+
+def get_nodal_inflow(jem,node):
+    '''Return inflows to a given node
+    '''
+    return jem.results_arcflows.loc[jem.results_arcflows.to_id == node]
+
+
+def get_nodal_outflow(jem,node):
+    '''Return outflows from a given node
+    '''
+    return jem.results_arcflows.loc[jem.results_arcflows.from_id == node]
+
+
+def get_nodal_balance(jem,node):
+    '''Return inflow and outflow at a given node
+    '''
+    inflow  = get_nodal_inflow(jem,node).flow.sum()
+    outflow = get_nodal_outflow(jem,node).flow.sum()
+    delta   = outflow - inflow
+    if delta == 0:
+        balance = 'balanced'
+    elif delta > 0:
+        balance = 'excess'
+    elif delta < 0:
+        balance = 'shortage'
+    return {'inflow' : inflow, 'outflow' : outflow, 'mass_balance' : balance}
+
+
+
+
 
 
 
