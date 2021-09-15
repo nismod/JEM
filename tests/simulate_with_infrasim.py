@@ -54,30 +54,27 @@ jem.run(print_to_console=True)
 # PROCESS RESULTS OR DEBUG
 
 try:
-        
-    #---
-    # Export results to GIS
     
-    edges = gpd.read_file(path_to_edges)
-    nodes = gpd.read_file(path_to_nodes)
+    
+    
+    def flows_to_shapefile(jem,filename,driver='ESRI Shapefile',timestep=1):
+        '''Export optimal flow results to shapefile
+        '''
+        results = merge_edges_with_flows(jem)
+        results.to_file(driver='ESRI Shapefile',filename=filename)
+        
+
+    flows_to_shapefile(jem,filename='../data/demo/jem_results_edges.shp')
+    
+    
     
     # tag nodes that were supplied by super_source
-    jem = tag_super_source_flows(jem)
-    
+    # jem = tag_super_source_flows(jem)
     
     # save
-    jem.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/jem_results_nodes.shp')
+    # jem.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/jem_results_nodes.shp')
     
-    # # concat
-    # rr = pd.concat([edges,r],axis=1).sort_values(by='id')
-    # edges = edges.sort_values(by='id')
-    
-    # # add to edges
-    # edges['Result'] = rr.Value
-    
-    # # save
-    # edges.to_file(driver='ESRI Shapefile', filename='../data/demo/model_results.shp')
-    
+
 except:
     print('simulation failed')
     #jem.debug()
