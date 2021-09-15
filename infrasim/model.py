@@ -295,9 +295,9 @@ class infrasim():
             # arcFlows
             arcFlows            = self.model.getAttr('x', self.arcFlows)
             keys                = pd.DataFrame(arcFlows.keys(),columns=['from_id','to_id','timestep'])
-            vals                = pd.DataFrame(arcFlows.items(),columns=['key','Value'])
+            vals                = pd.DataFrame(arcFlows.items(),columns=['key','flow'])
             results_arcflows    = pd.concat([keys,vals],axis=1)
-            results_arcflows    = results_arcflows[['from_id','to_id','timestep','Value']]
+            results_arcflows    = results_arcflows[['from_id','to_id','timestep','flow']]
             # write csv
             results_arcflows.to_csv(metainfo['outputs_data']+'results_arcflows.csv',index=False)
             self.results_arcflows = results_arcflows
