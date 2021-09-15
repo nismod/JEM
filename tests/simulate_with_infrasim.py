@@ -55,31 +55,7 @@ jem.run(print_to_console=True)
 
 try:
     
-    def get_nodal_inflow(jem,node):
-        '''Return inflows to a given node
-        '''
-        return jem.results_arcflows.loc[jem.results_arcflows.to_id == node]
     
-    
-    def get_nodal_outflow(jem,node):
-        '''Return outflows from a given node
-        '''
-        return jem.results_arcflows.loc[jem.results_arcflows.from_id == node]
-    
-    
-    def get_nodal_balance(jem,node):
-        '''Return inflow and outflow at a given node
-        '''
-        inflow  = get_nodal_inflow(jem,node).flow.sum()
-        outflow = get_nodal_outflow(jem,node).flow.sum()
-        delta   = outflow - inflow
-        if delta == 0:
-            balance = 'balanced'
-        elif delta > 0:
-            balance = 'excess'
-        elif delta < 0:
-            balance = 'shortage'
-        return {'inflow' : inflow, 'outflow' : outflow, 'mass_balance' : balance}
         
 
     # flows_to_shapefile(jem,filename='../data/demo/jem_results_edges.shp')
