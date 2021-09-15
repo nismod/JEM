@@ -77,7 +77,23 @@ def tag_super_source_flows(jem):
     return jem
 
 
-##
+def merge_edges_with_flows(jem):
+    '''Merge edge data with results of optimal flows
+    '''
+    results = jem.results_arcflows.copy()
+    edges   = jem.edges.copy()
+    if 'timestep' in list(results.columns) and list(edges.columns):
+        edges = edges.drop(['timestep'],axis=1)
+    #merge
+    return edges.merge(results,on=['from_id','to_id'])
+
+
+
+
+
+
+
+
 
 #---
 # Pre-processing (messy code...)
