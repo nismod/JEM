@@ -259,6 +259,7 @@ verbose_print('done')
 network = append_electricity_intensities(network)
 print('appended electricity data')
 
+
 #===
 # GET CONNECTED COMPONENTS
 verbose_print('getting connected components...')
@@ -289,7 +290,7 @@ network.edges = network.edges[['id', 'asset_type', 'from_id', 'to_id', 'from_typ
                                'source', 'component_id', 'geometry']]
 
 network.nodes = network.nodes[['id','asset_type','subtype','capacity','population',
-                              'cost_min','cost_max','cost_avg','cost_uom',
+                              'ei', 'ei_uom', 'cost_min','cost_max','cost_avg','cost_uom',
                               'degree','parish','title','source','geometry']]
 
 verbose_print('re-indexed data')
