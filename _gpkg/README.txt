@@ -19,6 +19,14 @@ Overview:
 Versions:
 --------
 
+	VERSION 1.0
+		- Added population and energy intensity data
+		- Energy demands can now be computed based on population and energy intensity
+		- Known issues:
+			1. Topology around substations is incorrect in parts
+			2. Some multilinestring data is not being properly processed by snkit functions
+			   and is hence dropped from the dataset
+
 	VERSION 0.2
 		- Added unit cost data
 		- Known issues:
