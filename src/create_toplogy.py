@@ -44,6 +44,7 @@ from JEM.snkit.snkit.src.snkit.network import *
 from utils import *
 from merge_cost_data import *
 from electricity_demand_assignment import *
+from merge_elec_consumption_data import *
 
 #=======================
 # GLOBAL PARAMS
@@ -254,6 +255,11 @@ verbose_print('done')
 
 
 #===
+# APPEND ELECTRICITY INTENSITIES
+network = append_electricity_intensities(network)
+print('appended electricity data')
+
+#===
 # GET CONNECTED COMPONENTS
 verbose_print('getting connected components...')
 
@@ -282,7 +288,7 @@ network.edges = network.edges[['id', 'asset_type', 'from_id', 'to_id', 'from_typ
                                'cost_max', 'cost_avg','cost_uom','name', 'parish',
                                'source', 'component_id', 'geometry']]
 
-network.nodes = network.nodes[['id','asset_type','subtype','capacity',
+network.nodes = network.nodes[['id','asset_type','subtype','capacity','population',
                               'cost_min','cost_max','cost_avg','cost_uom',
                               'degree','parish','title','source','geometry']]
 
