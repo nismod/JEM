@@ -52,8 +52,9 @@ def append_energy_data_to_boundaries(boundaries,elec_data):
     '''
     elec_dict = elec_data.set_index('Parish')['2020'].to_dict()
     boundaries['consumption'] = boundaries['PARISH'].map(elec_dict)
-    boundaries['elec_intensity'] = boundaries.POP2001 / boundaries.consumption
-    return boundaries[['PARISH','POP2001','consumption','elec_intensity','geometry',]]
+    boundaries['ei'] = boundaries.POP2001 / boundaries.consumption
+    boundaries['ei_uom'] = 'MW/person'
+    return boundaries[['PARISH','POP2001','consumption','ei','ei_uom','geometry',]]
 
 
 def get_ei_by_parish():
@@ -69,7 +70,7 @@ def append_electricity_intensities(network,parish_col='parish'):
     '''Append electricity intensities to snkit network data in create_topology
     '''
     boundaries = get_ei_by_parish()
-    ei_dict = boundaries.set_index('PARISH')['elec_intensity'].to_dict()
+    ei_dict = boundaries.set_index('PARISH')['ei'].to_dict()
     # add parishes to nodes
     network.nodes = gpd.overlay(network.nodes,boundaries)
     # parish col
