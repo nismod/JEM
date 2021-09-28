@@ -137,8 +137,6 @@ def get_nodal_balance(jem,node):
 
 
 
-
-
 #---
 # Pre-processing (messy code...)
 #---

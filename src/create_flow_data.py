@@ -20,17 +20,24 @@ sys.path.append("../../")
 from utils import *
 
 
-
-#=======================
-# PARAMS
-
-verbose_flag = True
-
-
-
 #=======================
 # PROCESSING
 
+def compute_demand(nodes):
+    '''Calculate demand based on population and ei
+    '''
+    
+
 # read data
 network = read_data(path_to_nodes='../data/spatial/nodes_processed.shp')
-verbose_print('loaded data',flag=verbose_flag)
+
+flow_nodes = get_flow_nodes(network) 
+
+
+# # supplies
+# supply_nodes = network.nodes.loc[network.nodes.asset_type == 'source'].reset_index(drop=True)
+
+# supply_nodes = supply_nodes[['id','capacity']]
+
+# # pivot
+# t = supply_nodes.pivot_table(columns='id')
