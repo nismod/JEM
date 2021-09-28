@@ -10,8 +10,8 @@ from JEM.infrasim.spatial import get_isolated_graphs
 from JEM.snkit.snkit.src.snkit.network import *
 
 
-def verbose_print(msg):
-    verbose = True
+def verbose_print(msg,flag=True):
+    verbose = flag
     if not verbose:
         pass
     else:

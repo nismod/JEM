@@ -49,6 +49,7 @@ from merge_elec_consumption_data import *
 #=======================
 # GLOBAL PARAMS
 
+verbose_flag=True
 remove_connected_components = False
 connected_component_tolerance = 15
 
@@ -58,24 +59,24 @@ connected_component_tolerance = 15
 
 # read data
 network = read_data()
-verbose_print('loaded data')
+verbose_print('loaded data',flag=verbose_flag)
 
 # remove known bugs
 if 'bug' in network.edges.columns:
     network.edges = network.edges[network.edges.bug != 'true'].reset_index(drop=True)
-verbose_print('removed known bugs')
+verbose_print('removed known bugs',flag=verbose_flag)
 
 # merge multilinestrings
 network = remove_multiline(network)
-verbose_print('removed multilines')
+verbose_print('removed multilines',flag=verbose_flag)
 
 # delete NoneType
 network = remove_nontype(network)
-verbose_print('removed NonType')
+verbose_print('removed NonType',flag=verbose_flag)
 
 # explode multipart linestrings
 network = explode_multipart(network)
-verbose_print('explode multipart linestrings')
+verbose_print('explode multipart linestrings',flag=verbose_flag)
 
 # save raw data from jps
 jps_nodes = network.nodes.copy()
@@ -83,19 +84,19 @@ jps_edges = network.edges.copy()
 
 # Merge edges
 network = add_endpoints(network)
-verbose_print('added end points')
+verbose_print('added end points',flag=verbose_flag)
 
 # add ids
 network = add_ids(network)
-verbose_print('added IDs')
+verbose_print('added IDs',flag=verbose_flag)
 
 # add topology
 network = add_topology(network, id_col='id')
-verbose_print('added topology')
+verbose_print('added topology',flag=verbose_flag)
 
 # merge using snkit
 # network = merge_edges(network,by='asset_type')
-verbose_print('merged edges')
+verbose_print('merged edges',flag=verbose_flag)
 
 # remove multilines again...
 network = remove_multiline(network)
@@ -103,7 +104,7 @@ network = remove_multiline(network)
 #===
 # SNAP LV LINES TO SUBSTATIONS
 
-verbose_print('snapping lines to substations...')
+verbose_print('snapping lines to substations...',flag=verbose_flag)
 
 # LV
 lv_voltages = ['24 kV', '12 kV']
@@ -126,14 +127,14 @@ for s in substations:
         # update in edge data
         network.edges.loc[network.edges.index == e.Index, 'geometry'] = LineString(e_coords)
 
-verbose_print('done')
+verbose_print('done',flag=verbose_flag)
 
 
 
 #===
 # ADD JUNCTIONS AND SINKS
 
-verbose_print('adding junctions and sinks...')
+verbose_print('adding junctions and sinks...',flag=verbose_flag)
 
 # add endpoints
 network = add_endpoints(network)
@@ -166,14 +167,14 @@ for n in jps_nodes.title:
     network.nodes.loc[network.nodes.title == n, 'asset_type'] = jps_nodes.loc[jps_nodes.title == n].asset_type.iloc[0]
     network.nodes.loc[network.nodes.title == n, 'subtype'] = jps_nodes.loc[jps_nodes.title == n].subtype.iloc[0]
 
-verbose_print('done')
+verbose_print('done',flag=verbose_flag)
 
 
 
 #===
 # CONVERT FALSE JUNCTIONS TO SINKS
 
-verbose_print('converting false junctions...')
+verbose_print('converting false junctions...',flag=verbose_flag)
 
 nodes_to_test = network.nodes[network.nodes.subtype.isin(['pole'])].reset_index(drop=True)
 for n in nodes_to_test.id:
@@ -187,7 +188,7 @@ for n in nodes_to_test.id:
         prev_line = network.edges[network.edges.from_id == n].geometry.values[0]
         network.edges.loc[network.edges.from_id == n, 'geometry'] = flip(prev_line)
 
-verbose_print('done')
+verbose_print('done',flag=verbose_flag)
 
 
 
@@ -196,73 +197,73 @@ verbose_print('done')
 
 # add length to line data
 network = add_edge_length(network)
-verbose_print('added line lengths')
+verbose_print('added line lengths',flag=verbose_flag)
 
 # remove duplicated
 network = remove_duplicates(network)
-verbose_print('removed duplicates')
+verbose_print('removed duplicates',flag=verbose_flag)
 
 # add max/min
 network = add_limits_to_edges(network)
-verbose_print('added limits to edge flows')
+verbose_print('added limits to edge flows',flag=verbose_flag)
 
 # double-up edges
 network = bidirectional_edges(network)
-verbose_print('made edges bidirectional')
+verbose_print('made edges bidirectional',flag=verbose_flag)
 
 # remove sink-to-sink connections
 network = remove_sink_to_sink(network)
-verbose_print('removed sink to sinks')
+verbose_print('removed sink to sinks',flag=verbose_flag)
 
 # add node degree
 network = add_nodal_degree(network)
-verbose_print('added nodal degrees')
+verbose_print('added nodal degrees',flag=verbose_flag)
 
 # drop zero degree sinks
 network = remove_stranded_nodes(network)
-verbose_print('removed stranded nodes')
+verbose_print('removed stranded nodes',flag=verbose_flag)
 
 # remove self-loops
 network = remove_self_loops(network)
-verbose_print('removed self-loops')
+verbose_print('removed self-loops',flag=verbose_flag)
 
 # change asset_type of sinks with >2 degree connectivity
 network.nodes.loc[(network.nodes.degree > 2) & \
                   (network.nodes.asset_type == 'sink'), 'asset_type'] = 'junction'
 
-verbose_print('converted sinks of degree>0 to junctions')
+verbose_print('converted sinks of degree>0 to junctions',flag=verbose_flag)
 
 
 
 #===
 # ADD COST DATA
-verbose_print('merging cost data...')
+verbose_print('merging cost data...',flag=verbose_flag)
 
 network = merge_cost_data(network,
                         path_to_costs='../data/costs_and_damages/maximum_damage_values.csv',
                         print_to_console=False)
 
-verbose_print('done')
+verbose_print('done',flag=verbose_flag)
 
 
 
 #===
 # ADD POPULATION
-verbose_print('adding population...')
+verbose_print('adding population...',flag=verbose_flag)
 population = gpd.read_file('../data/incoming_data/admin_boundaries.gpkg',layer='admin3')
 network = assign_pop_to_sinks(network,population)
-verbose_print('done')
+verbose_print('done',flag=verbose_flag)
 
 
 #===
 # APPEND ELECTRICITY INTENSITIES
 network = append_electricity_intensities(network)
-print('appended electricity data')
+print('appended electricity data',flag=verbose_flag)
 
 
 #===
 # GET CONNECTED COMPONENTS
-verbose_print('getting connected components...')
+verbose_print('getting connected components...',flag=verbose_flag)
 
 network = add_component_ids(network)
 # remove
@@ -278,7 +279,7 @@ else:
 # Update network notation
 network = update_notation(network)
 
-verbose_print('done')
+verbose_print('done',flag=verbose_flag)
 
 
 
@@ -293,12 +294,12 @@ network.nodes = network.nodes[['id','asset_type','subtype','capacity','populatio
                               'ei', 'ei_uom', 'cost_min','cost_max','cost_avg','cost_uom',
                               'degree','parish','title','source','geometry']]
 
-verbose_print('re-indexed data')
+verbose_print('re-indexed data',flag=verbose_flag)
 
 #===
 # SAVE DATA
-verbose_print('saving...')
+verbose_print('saving...',flag=verbose_flag)
 
 save_data(network)
 
-verbose_print('create_toplogy finished')
+verbose_print('create_toplogy finished',flag=verbose_flag)
