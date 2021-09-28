@@ -258,7 +258,7 @@ verbose_print('done',flag=verbose_flag)
 #===
 # APPEND ELECTRICITY INTENSITIES
 network = append_electricity_intensities(network)
-print('appended electricity data',flag=verbose_flag)
+verbose_print('appended electricity data',flag=verbose_flag)
 
 
 #===
