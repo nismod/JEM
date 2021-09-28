@@ -222,5 +222,13 @@ def remove_multiline(network):
 
 
 def save_data(network):
+    '''Save processed node and edge data
+    '''
     network.nodes.to_file(driver='ESRI Shapefile', filename='../data/spatial/nodes_processed.shp')
     network.edges.to_file(driver='ESRI Shapefile', filename='../data/spatial/edges_processed.shp')
+
+
+def get_flow_nodes(network):
+    '''Return sources and sinks
+    '''
+    return network.nodes.loc[network.nodes.asset_type.isin(['source','sink'])]
