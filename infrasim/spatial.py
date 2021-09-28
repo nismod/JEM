@@ -58,7 +58,7 @@ def to_nx(nodes,edges):
     # create list of weighted edges
     edges_as_list = [(edges.loc[i].from_id, 
                       edges.loc[i].to_id, 
-                      edges.loc[i].length_km) for i in edges.index]
+                      edges.loc[i].length) for i in edges.index]
     
     # add edges to graph
     G.add_weighted_edges_from(edges_as_list)
