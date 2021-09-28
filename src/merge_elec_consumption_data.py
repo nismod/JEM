@@ -30,9 +30,12 @@ def process_raw_consumption_data(path):
     elec_data.columns = [str(i[1]) for i in elec_data.columns.values]
     elec_data = elec_data.reset_index()
     # convert str to data
-    for col in ['2014', '2015', '2016', '2017', '2018', '2019', '2020',]:
-        elec_data[col] = elec_data[col].str.strip().str.replace(',','')
-        elec_data[col] = elec_data[col].astype(float)
+    try:
+        for col in ['2014', '2015', '2016', '2017', '2018', '2019', '2020',]:
+            elec_data[col] = elec_data[col].str.strip().str.replace(',','')
+            elec_data[col] = elec_data[col].astype(float)
+    except:
+        pass
     # rename parish col
     elec_data['Parish'] = elec_data['PARISH']
     elec_data = elec_data.drop(['PARISH'],axis=1)
@@ -52,7 +55,7 @@ def append_energy_data_to_boundaries(boundaries,elec_data):
     '''
     elec_dict = elec_data.set_index('Parish')['2020'].to_dict()
     boundaries['consumption'] = boundaries['PARISH'].map(elec_dict)
-    boundaries['ei'] = boundaries.POP2001 / boundaries.consumption
+    boundaries['ei'] = boundaries.consumption / boundaries.POP2001
     boundaries['ei_uom'] = 'MW/person'
     return boundaries[['PARISH','POP2001','consumption','ei','ei_uom','geometry',]]
 
