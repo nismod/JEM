@@ -217,7 +217,7 @@ def add_super_source(nodes,edges):
     
     tmp_edges = pd.DataFrame({'from_id'     : 'super_source',
                               'to_id'       : nodes.id.unique(),
-                              'length_km'   : constants['super_source_maximum'],
+                              'length'      : constants['super_source_maximum'],
                               'min'         : 0,
                               'max'         : constants['super_source_maximum']})
     
@@ -235,7 +235,7 @@ def add_super_sink(nodes,edges):
 
     tmp_edges = pd.DataFrame({'from_id'     : nodes.id.unique(),
                               'to_id'       : 'super_sink',
-                              'length_km'   : constants['super_source_maximum'],
+                              'length'      : constants['super_source_maximum'],
                               'min'         : 0,
                               'max'         : constants['super_source_maximum']})
     

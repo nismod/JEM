@@ -18,7 +18,7 @@ from infrasim.utils import *
 # RUN MODEL
 
 # define input files
-flows = '../data/demo/csv/nodal_flows.csv'
+flows = '../data/csv/generated_nodal_flows.csv'
 
 # '../data/demo/nodes_demo_microsample_processed.shp'
 # '../data/demo/edges_demo_microsample_processed.shp'
@@ -54,9 +54,8 @@ jem.run(print_to_console=True)
 # PROCESS RESULTS OR DEBUG
 
 try:
-    
-    
-        
+      
+    print('meow')    
 
     # flows_to_shapefile(jem,filename='../data/demo/jem_results_edges.shp')
     

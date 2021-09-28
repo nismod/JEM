@@ -8,11 +8,11 @@
 metainfo = {
             'i_field'               : 'from_id',
             'j_field'               : 'to_id',
-            'cost_column'           : 'length_km',
+            'cost_column'           : 'length',
             'upper_bound'           : 'max',
             'lower_bound'           : 'min',
             'nodes_header'          : ['id','asset_type','subtype','title','capacity'],
-            'edges_header'          : ['id','from_id','to_id','length_km','min','max'],
+            'edges_header'          : ['id','from_id','to_id','length','min','max'],
             'flow_header'           : [],
             'edge_index_variables'  : ['from_id','to_id','timestep'],
             'infrasim_cache'        : '../data/__infrasim__/',
