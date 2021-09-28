@@ -18,25 +18,15 @@ from infrasim.utils import *
 # RUN MODEL
 
 # define input files
-flows = '../data/csv/generated_nodal_flows.csv'
-
-# '../data/demo/nodes_demo_microsample_processed.shp'
-# '../data/demo/edges_demo_microsample_processed.shp'
-
-# '../data/demo/nodes_demo_processed.shp'
-# '../data/demo/edges_demo_processed.shp'
-
-# '../data/spatial/nodes_processed.shp'
-# '../data/spatial/edges_processed.shp'
-
+path_to_flows = '../data/csv/generated_nodal_flows.csv'
 path_to_nodes = '../data/spatial/nodes_processed.shp'
 path_to_edges = '../data/spatial/edges_processed.shp'
 
 # init model
 jem = infrasim(path_to_nodes,
                path_to_edges,
-               flows,
-               timesteps=1,
+               path_to_flows,
+               #timesteps=1,
                print_to_console=False,
                #nodes_to_attack=['node_2009'],
                #edges_to_attack=['edge_712'],
@@ -54,20 +44,21 @@ jem.run(print_to_console=True)
 # PROCESS RESULTS OR DEBUG
 
 try:
-      
-    print('meow')    
-
-    # flows_to_shapefile(jem,filename='../data/demo/jem_results_edges.shp')
     
     # tag nodes that were supplied by super_source
-    # jem = tag_super_source_flows(jem)
+    jem = tag_super_source_flows(jem)
     
     # save
-    # jem.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/jem_results_nodes.shp')
+    jem.nodes.to_file(driver='ESRI Shapefile', filename='../data/demo/jem_results_nodes.shp')
+    flows_to_shapefile(jem,filename='../data/demo/jem_results_edges.shp')
     
 
 except:
     print('simulation failed')
-    #jem.debug()
+    jem.debug()
     
-
+    
+    
+    
+ss = jem.results_arcflows[jem.results_arcflows.from_id == 'super_source']
+ss[ss.flow>0]
