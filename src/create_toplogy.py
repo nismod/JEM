@@ -50,7 +50,7 @@ from merge_elec_consumption_data import *
 # GLOBAL PARAMS
 
 verbose_flag=True
-remove_connected_components = False
+remove_connected_components = True
 connected_component_tolerance = 1
 
 
@@ -270,7 +270,7 @@ network = add_component_ids(network)
 if not remove_connected_components:
     pass
 else:
-    graphs_to_remove = network.edges.loc[network.edges.nx_part > connected_component_tolerance]
+    graphs_to_remove = network.edges.loc[network.edges.component_id > connected_component_tolerance]
     nodes_to_remove = graphs_to_remove.from_id.to_list() + graphs_to_remove.to_id.to_list()
     edges_to_remove = graphs_to_remove.id.to_list()
     # drop

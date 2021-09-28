@@ -35,17 +35,23 @@ def compute_supply_demand(nodes):
         nodes.loc[nodes.asset_type == 'sink', 'population'] * \
             nodes.loc[nodes.asset_type == 'sink', 'ei']
     return nodes
-    
+
+# path_to_nodes = '../data/demo/nodes_demo.shp'
+# path_to_edges = '../data/demo/edges_demo.shp'
+
+path_to_nodes='../data/spatial/nodes_processed.shp'
+path_to_edges='../data/spatial/edges_processed.shp'
 
 # read data
-network = read_data(path_to_nodes='../data/spatial/nodes_processed.shp',
-                    path_to_edges='../data/spatial/edges_processed.shp')
+network = read_data(path_to_nodes=path_to_nodes,
+                    path_to_edges=path_to_edges)
+
 print('loaded data')
 
 # flow nodes
 flow_nodes = get_flow_nodes(network).reset_index(drop=True)
 flow_nodes = compute_supply_demand(flow_nodes)
-flow_nodes['flow'] = flow_nodes['flow'] * 1000  # convert to kW
+flow_nodes['flow'] = flow_nodes['flow'] * 10 ** 6  # MW to W
 
 # pivot
 flow_nodes = flow_nodes[['id','flow']]
@@ -53,6 +59,7 @@ list_of_nodes = flow_nodes.id.to_list()
 flow_nodes = flow_nodes.pivot_table(columns='id').reset_index()
 flow_nodes['timestep'] = 1
 flow_nodes = flow_nodes[['timestep'] + list_of_nodes]
+flow_nodes = flow_nodes.astype('int')
 
 # save file
 flow_nodes.to_csv('../data/csv/generated_nodal_flows.csv',index=False)
