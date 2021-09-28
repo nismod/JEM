@@ -24,7 +24,7 @@ def process_raw_consumption_data(path):
     '''Process raw consumption data from JPS
     '''
     elec_data  = pd.read_csv(path)
-    elec_data  = elec_data[['PARISH','Year','PARISH TOTAL']]
+    elec_data  = elec_data[['PARISH','Year','PARISH LOAD']]
     # pivot data
     elec_data  = elec_data.pivot(index='PARISH',columns='Year')
     elec_data.columns = [str(i[1]) for i in elec_data.columns.values]
