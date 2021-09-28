@@ -231,4 +231,4 @@ def save_data(network):
 def get_flow_nodes(network):
     '''Return sources and sinks
     '''
-    return network.nodes.loc[network.nodes.asset_type.isin(['source','sink'])]
+    return network.nodes.loc[network.nodes.asset_type.isin(['source','sink'])].copy()
