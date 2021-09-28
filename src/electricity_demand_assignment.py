@@ -29,7 +29,10 @@ def assign_pop_to_sinks(network,pop_bound,
                                                             pop_bound,
                                                             nodal_id,
                                                             pop_id,
-                                                            epsg=epsg)
+                                                            epsg=epsg,
+                                                            save=True,
+                                                            voronoi_path='../data/spatial/pop-voronoi.shp',
+                                                            )
     #remap
     pop_mapped = new_nodes[['id','TOTAL_POP']].set_index('id')['TOTAL_POP'].to_dict()
     # reassign
