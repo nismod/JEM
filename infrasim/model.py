@@ -252,10 +252,10 @@ class infrasim():
         #---
         # UPPER FLOW BOUND        
 
-        # # Flows must be below upper bounds
-        # upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
-        # self.model.addConstrs((self.arcFlows[i,j,t] <= 9999
-        #                         for i,j,t in self.arcFlows),'upper_bound')
+        # Flows must be below upper bounds
+        upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
+        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
+                                for i,j,t in self.arcFlows),'upper_bound')
         
         
         #---

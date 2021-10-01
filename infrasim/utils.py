@@ -113,6 +113,13 @@ def get_nodal_outflow(jem,node):
     return jem.results_arcflows.loc[jem.results_arcflows.from_id == node]
 
 
+def get_flow_at_node(jem,node):
+    '''Return inflows and ouflows at a given node
+    '''
+    return jem.results_arcflows.loc[ (jem.results_arcflows.from_id == node) | \
+                                     (jem.results_arcflows.to_id == node)]
+
+
 def get_nodal_balance(jem,node):
     '''Return inflow and outflow at a given node
     '''
@@ -126,8 +133,6 @@ def get_nodal_balance(jem,node):
     elif delta < 0:
         balance = 'shortage'
     return {'inflow' : inflow, 'outflow' : outflow, 'mass_balance' : balance}
-
-
 
 
 

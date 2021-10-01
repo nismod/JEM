@@ -28,9 +28,9 @@ jem = infrasim(path_to_nodes,
                path_to_flows,
                #timesteps=1,
                print_to_console=False,
-               #nodes_to_attack=['node_2009'],
+               nodes_to_attack=['node_25651'],
                #edges_to_attack=['edge_712'],
-               super_source=False,
+               super_source=True,
                super_sink=False)
 
 # build model
