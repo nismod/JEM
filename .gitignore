@@ -11,3 +11,4 @@ src/create_flow_data_v2.py
 outputs/statistics/results_arcflows.csv
 test.csv
 jamaica-infrastructure/
+src/convert_geoparquet.py
