@@ -36,6 +36,7 @@ sys.path.append("../../")
 
 # Import infrasim spatial tools
 from JEM.infrasim.spatial import get_isolated_graphs
+from JEM.infrasim.utils import get_nodal_edges
 
 # Import local copy of snkit
 from JEM.snkit.snkit.src.snkit.network import *
@@ -284,6 +285,22 @@ network = update_notation(network)
 
 verbose_print('done',flag=verbose_flag)
 
+
+#===
+# ADD CAPACITY ATTRIBUTES
+verbose_print('adding capacity attributes to nodes...',flag=verbose_flag)
+
+def nodal_capacity_from_edges(node,network):
+    nodal_edges = get_nodal_edges(network,node).id.to_list()
+    return network.edges.loc[network.edges.id.isin(nodal_edges)]['max'].max()
+
+
+network.nodes['capacity'] \
+    = network.nodes.progress_apply(
+        lambda x: nodal_capacity_from_edges(x['id'],network) \
+            if pd.isnull(x['capacity']) else x['capacity'], axis=1 )
+
+verbose_print('done',flag=verbose_flag)
 
 
 #===

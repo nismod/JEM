@@ -31,6 +31,19 @@ def read_data(with_snkit=True,**kwargs):
         return Network(nodes,edges)
 
 
+def read_processed_data(with_snkit=True,**kwargs):
+    # paths
+    path_to_edges = kwargs.get('path_to_edges','../data/spatial/edges_processed.shp')
+    path_to_nodes = kwargs.get('path_to_nodes','../data/spatial/nodes_processed.shp')
+    # read
+    edges = gpd.read_file(path_to_edges)
+    nodes = gpd.read_file(path_to_nodes)
+    if not with_snkit:
+        return nodes,edges
+    else:
+        return Network(nodes,edges)
+    
+
 def extract_parish_sample(network,parish_name):
     '''Extract a sample for a given parish
     '''
@@ -145,8 +158,13 @@ def add_limits_to_edges(network,amp_assumption=700):
     '''Add flow limits to edge data
     '''
     network.edges['min'] = 0
+    # Volts * Amps = Watts
     network.edges['max'] = network.edges.voltage_kV.astype('int') \
-                            * 1000 * amp_assumption # Volts * Amps = Watts
+                            * 1000 * amp_assumption * 10 ** -6 # MW
+    return network
+
+
+def add_capacity_to_nodes(network):
     return network
 
 

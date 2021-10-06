@@ -3,6 +3,7 @@ documents/*
 data/*
 snkit/*
 _tmp/*
+_gpkg/*
 jamaica-infrastructure/*
 _gpkg/electricity_networkv_v1.0.gpkg
 

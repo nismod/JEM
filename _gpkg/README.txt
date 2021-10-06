@@ -19,6 +19,13 @@ Overview:
 Versions:
 --------
 
+	VERSION 1.1
+		- Added capacity attributes to nodes (col: capacity) and edges (col: max)
+		- Known issues:
+			1. Topology around substations is incorrect in parts
+			2. Some multilinestring data is not being properly processed by snkit functions
+			   and is hence dropped from the dataset
+
 	VERSION 1.0
 		- Added population and energy intensity data
 		- Energy demands can now be computed based on population and energy intensity
