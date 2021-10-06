@@ -101,6 +101,11 @@ def flows_to_shapefile(jem,filename,driver='ESRI Shapefile',timestep=1):
     results.to_file(driver='ESRI Shapefile',filename=filename)
 
 
+def get_nodal_edges(jem,node):
+    return jem.edges.loc[(jem.edges.from_id == node) | \
+                         (jem.edges.to_id == node)]
+
+
 def get_nodal_inflow(jem,node):
     '''Return inflows to a given node
     '''
@@ -135,10 +140,20 @@ def get_nodal_balance(jem,node):
     return {'inflow' : inflow, 'outflow' : outflow, 'mass_balance' : balance}
 
 
+def estimate_edge_capacity(jem,cap_name='cap_estimate',rounding=False):
+    '''Estimate edge capacity (W) from flow data
+    '''
+    flow_results = merge_edges_with_flows(jem)
+    flow_results[cap_name] = flow_results.flow.divide(24) # Watts
+    if not rounding:
+        pass
+    else:
+        flow_results[cap_name] = flow_results[cap_name].apply(lambda x:roundup(x))
+    return flow_results[['id',cap_name]]
 
 
-
-
+def roundup(x):
+    return x if x % 100 == 0 else x + 100 - x % 100
 
 
 
