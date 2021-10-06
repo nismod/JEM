@@ -19,40 +19,41 @@ from .params import *
 # Conversions
 #---
 
-def kwh_to_gwh(v):
+
+def kwh_to_gwh(x):
     '''Kilowatt hours to Gigawatt hours
     '''
-    return v*0.000001
+    return x*0.000001
 
 
-def gwh_to_kwh(v):
+def gwh_to_kwh(x):
     '''Gigawatt hours to Kilowatt hours
     '''
-    return v/0.000001
+    return x/0.000001
 
 
-def cmd_to_mld(v):
+def cmd_to_mld(x):
     '''Cubic meters per day to megalitres per day
     '''
-    return v/0.001
+    return x/0.001
 
 
 def mld_to_cmd(v):
     '''Megalitres per day to cubic meters per day
     '''
-    return v*0.001
+    return x*0.001
 
 
 def lps_to_cmps(v):
     '''Litres per second to cubic meters per second
     '''
-    return v*0.001
+    return x*0.001
 
 
 def seconds_to_hours(v):
     '''Convert seconds to hours
     '''
-    return v*3600
+    return x*3600
 
 
 
