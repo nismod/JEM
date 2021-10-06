@@ -141,11 +141,12 @@ def remove_duplicates(network):
     return network
 
 
-def add_limits_to_edges(network,min=0,max=1.000000e+12):
+def add_limits_to_edges(network,amp_assumption=700):
     '''Add flow limits to edge data
     '''
-    network.edges['min'] = min
-    network.edges['max'] = max
+    network.edges['min'] = 0
+    network.edges['max'] = network.edges.voltage_kV.astype('int') \
+                            * 1000 * amp_assumption # Volts * Amps = Watts
     return network
 
 

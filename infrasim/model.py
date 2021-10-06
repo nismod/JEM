@@ -42,7 +42,8 @@ class infrasim():
         
         # read flow data
         flows = pd.read_csv(flows)
-
+        
+        
         # restrict timesteps
         timesteps_restriction = kwargs.get("timesteps", None)
         if timesteps_restriction is not None:

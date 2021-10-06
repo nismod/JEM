@@ -203,6 +203,9 @@ verbose_print('added line lengths',flag=verbose_flag)
 network = remove_duplicates(network)
 verbose_print('removed duplicates',flag=verbose_flag)
 
+# change voltage column format
+network.edges['voltage_kV'] = network.edges.voltage.str.replace('kV','').astype('int')
+
 # add max/min
 network = add_limits_to_edges(network)
 verbose_print('added limits to edge flows',flag=verbose_flag)
@@ -286,7 +289,7 @@ verbose_print('done',flag=verbose_flag)
 #===
 # REINDEX
 network.edges = network.edges[['id', 'asset_type', 'from_id', 'to_id', 'from_type', 'to_type',
-                               'voltage', 'losses', 'length', 'min', 'max', 'cost_min',
+                               'voltage_kV', 'losses', 'length', 'min', 'max', 'cost_min',
                                'cost_max', 'cost_avg','cost_uom','name', 'parish',
                                'source', 'component_id', 'geometry']]
 
