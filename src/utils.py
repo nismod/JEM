@@ -42,6 +42,16 @@ def read_processed_data(with_snkit=True,**kwargs):
         return nodes,edges
     else:
         return Network(nodes,edges)
+
+
+def save_data(network,**kwargs):
+    '''Save processed node and edge data
+    '''
+    network.nodes.to_file(\
+        driver='ESRI Shapefile', filename=kwargs.get('path_to_nodes','../data/spatial/nodes_processed.shp'))
+                          
+    network.edges.to_file(\
+        driver='ESRI Shapefile', filename=kwargs.get('path_to_edges','../data/spatial/edges_processed.shp'))
     
 
 def extract_parish_sample(network,parish_name):
@@ -238,13 +248,6 @@ def remove_multiline(network):
     network.edges.geometry = network.edges.geometry.apply(merge_multilinestring)
     network.edges = network.edges.loc[network.edges.geom_type == 'LineString'].reset_index(drop=True)
     return network
-
-
-def save_data(network):
-    '''Save processed node and edge data
-    '''
-    network.nodes.to_file(driver='ESRI Shapefile', filename='../data/spatial/nodes_processed.shp')
-    network.edges.to_file(driver='ESRI Shapefile', filename='../data/spatial/edges_processed.shp')
 
 
 def get_flow_nodes(network):
