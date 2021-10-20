@@ -20,7 +20,7 @@ from .params import *
 
 
 
-class infrasim():
+class jem():
 
     
     def __init__(self,nodes,edges,flows,**kwargs):
@@ -65,6 +65,7 @@ class infrasim():
         #---
         # Tidy flow data
         flows = utils.tidy(flows)
+        #flows.flow = flows.flow.abs()
 
         #---
         # Create infrasim cache files
@@ -255,7 +256,7 @@ class infrasim():
 
         # Flows must be below upper bounds
         upper_bound = utils.arc_indicies_as_dict(self,metainfo['upper_bound'])
-        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t]
+        self.model.addConstrs((self.arcFlows[i,j,t] <= upper_bound[i,j,t] * 10 ** 12
                                 for i,j,t in self.arcFlows),'upper_bound')
         
         
@@ -275,7 +276,7 @@ class infrasim():
             print('------------- MODEL BUILD COMPLETE -------------')
 
 
-    def run(self,write=True,**kwargs):
+    def optimise(self,write=True,**kwargs):
         ''' Function to solve GurobiPy model'''
         # write model to LP
         if write==True:

@@ -56,7 +56,7 @@ def append_energy_data_to_boundaries(boundaries,elec_data):
     elec_dict = elec_data.set_index('Parish')['2020'].to_dict()
     boundaries['consumption'] = boundaries['PARISH'].map(elec_dict)
     boundaries['ei'] = boundaries.consumption / boundaries.POP2001
-    boundaries['ei_uom'] = 'MW/person'
+    boundaries['ei_uom'] = 'KW/person'
     return boundaries[['PARISH','POP2001','consumption','ei','ei_uom','geometry',]]
 
 

@@ -20,8 +20,8 @@ def verbose_print(msg,flag=True):
 
 def read_data(with_snkit=True,**kwargs):
     # paths
-    path_to_edges = kwargs.get('path_to_edges','../data/spatial/edges.shp')
-    path_to_nodes = kwargs.get('path_to_nodes','../data/spatial/nodes.shp')
+    path_to_edges = kwargs.get('path_to_edges','../data/spatial/else/edges.shp')
+    path_to_nodes = kwargs.get('path_to_nodes','../data/spatial/else/nodes.shp')
     # read
     edges = gpd.read_file(path_to_edges)
     nodes = gpd.read_file(path_to_nodes)
@@ -48,10 +48,10 @@ def save_data(network,**kwargs):
     '''Save processed node and edge data
     '''
     network.nodes.to_file(\
-        driver='ESRI Shapefile', filename=kwargs.get('path_to_nodes','../data/spatial/nodes_processed.shp'))
+        driver='ESRI Shapefile', filename=kwargs.get('path_to_nodes','../data/spatial/infrasim-network/nodes.shp'))
                           
     network.edges.to_file(\
-        driver='ESRI Shapefile', filename=kwargs.get('path_to_edges','../data/spatial/edges_processed.shp'))
+        driver='ESRI Shapefile', filename=kwargs.get('path_to_edges','../data/spatial/infrasim-network/edges.shp'))
     
 
 def extract_parish_sample(network,parish_name):

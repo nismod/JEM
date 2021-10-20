@@ -58,6 +58,46 @@ def seconds_to_hours(v):
 
 
 #---
+# Look ups
+#---
+
+def get_flow_nodes(jem):
+    '''Return sources and sinks
+    '''
+    return jem.nodes.loc[jem.nodes.asset_type.isin(['source','sink'])].id.to_list()
+
+
+def get_source_nodes(jem):
+    '''Return sources and sinks
+    '''
+    return jem.nodes.loc[jem.nodes.asset_type.isin(['source'])].id.to_list()
+
+
+def get_sink_nodes(jem):
+    '''Return sources and sinks
+    '''
+    return jem.nodes.loc[jem.nodes.asset_type.isin(['sink'])].id.to_list()
+
+
+
+#---
+# Analysis of results
+#---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#---
 # Post-processing
 #---
 
