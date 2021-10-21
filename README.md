@@ -13,7 +13,7 @@ This repository contains a simulation model for Jamaica's energy system formulat
 **Contributors and Collaborators**: <br>
 [Raghav Pant](https://github.com/itrcrisks), University of Oxford <br>
 [Tom Russell](https://github.com/tomalrussell), University of Oxford <br>
-[JPS Co.](https://www.jpsco.com/), Jamaica <br>
+<!-- [JPS Co.](https://www.jpsco.com/), Jamaica <br> -->
 
 <!-- ### What's Here
 The repository contains the InfraSim source code. The model has been applied to a case-study from the Thames basin, England, and will be expanded to other cases in future. These cases serve as a guide for other users to apply the InfraSim model to their areas of interest. An overview of each directory within the repository is shown below.
