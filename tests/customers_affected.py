@@ -78,3 +78,8 @@ for i in tqdm(range(0,len(nodes_damaged))):
     count = count + 1
 
 
+
+
+
+
+r = pd.DataFrame({'x' : x, 'y' : y})
