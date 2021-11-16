@@ -1,6 +1,15 @@
+data/_raw/*
+data/__infrasim__/*
+data/demo/*
+data/spatial/*
+data/transport/*
+data/risk-results/*
+data/incoming_data/*
+data/energy-demand/*
+data/csv/*
+
 _archived/*
 documents/*
-data/*
 snkit/*
 _tmp/*
 _gpkg/*
