@@ -35,8 +35,8 @@ import sys
 sys.path.append("../../")
 
 # Import infrasim spatial tools
-from JEM.infrasim.spatial import get_isolated_graphs
-from JEM.infrasim.utils import get_nodal_edges
+from JEM.jem.spatial import get_isolated_graphs
+from JEM.jem.utils import get_nodal_edges
 
 # Import local copy of snkit
 from JEM.snkit.snkit.src.snkit.network import *
