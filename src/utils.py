@@ -5,7 +5,7 @@ import re
 import sys
 sys.path.append("../../")
 # Import infrasim spatial tools
-from JEM.infrasim.spatial import get_isolated_graphs
+from JEM.jem.spatial import get_isolated_graphs
 # Import local copy of snkit
 from JEM.snkit.snkit.src.snkit.network import *
 

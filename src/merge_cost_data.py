@@ -72,7 +72,7 @@ def merge_cost_data(network,
     network.nodes['cost_avg'] = 0
     network.nodes['cost_uom'] = ''
     # fix
-    for n in ['solar','gas','wind','hydro','diesel','substation','pole']:
+    for n in ['solar','gas','wind','hydro','diesel','substation','pole','demand']:
         new_nodes = update_cost(network.nodes,costs,asset_type=n)
     # print result
     if print_to_console is True:
