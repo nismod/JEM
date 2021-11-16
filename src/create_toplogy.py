@@ -304,6 +304,11 @@ verbose_print('done',flag=verbose_flag)
 
 
 #===
+# ADD CAPACITY ATTRIBUTES
+
+
+
+#===
 # REINDEX
 network.edges = network.edges[['id', 'asset_type', 'from_id', 'to_id', 'from_type', 'to_type',
                                'voltage_kV', 'losses', 'length', 'min', 'max', 'cost_min',
