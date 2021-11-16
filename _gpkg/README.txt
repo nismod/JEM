@@ -19,6 +19,16 @@ Overview:
 Versions:
 --------
 
+	VERSION 1.2
+		- Costs are now provided as totals ($US) in addition to unit costs ($/MW or $/MW/km)
+		- Demand nodes are now treated the same as utility poles
+		- Naming convention changed to: nodes and edges
+		- Known issues:
+			1. Topology around substations is incorrect in parts
+			2. Some multilinestring data is not being properly processed by snkit functions
+			   and is hence dropped from the dataset
+			3. Hydro power plant locations unknown
+
 	VERSION 1.1
 		- Added capacity attributes to nodes (col: capacity) and edges (col: max)
 		- Known issues:

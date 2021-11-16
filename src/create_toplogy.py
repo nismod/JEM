@@ -307,9 +307,9 @@ verbose_print('done',flag=verbose_flag)
 # ADD TOTAL COSTS
 
 # edges
-network.edges['cost_min'] = network.edges['uc_min'] * network.edges['max']
-network.edges['cost_max'] = network.edges['uc_max'] * network.edges['max']
-network.edges['cost_avg'] = network.edges['uc_avg'] * network.edges['max']
+network.edges['cost_min'] = network.edges['uc_min'] * network.edges['max'] * network.edges['length']
+network.edges['cost_max'] = network.edges['uc_max'] * network.edges['max'] * network.edges['length']
+network.edges['cost_avg'] = network.edges['uc_avg'] * network.edges['max'] * network.edges['length']
 network.edges['cost_uom'] = '$US'
 
 # nodes
