@@ -52,7 +52,7 @@ from merge_elec_consumption_data import *
 
 verbose_flag=True
 remove_connected_components = True
-connected_component_tolerance = 99999
+connected_component_tolerance = 1
 
 
 #=======================
@@ -304,20 +304,33 @@ verbose_print('done',flag=verbose_flag)
 
 
 #===
-# ADD CAPACITY ATTRIBUTES
+# ADD TOTAL COSTS
 
+# edges
+network.edges['cost_min'] = network.edges['uc_min'] * network.edges['max']
+network.edges['cost_max'] = network.edges['uc_max'] * network.edges['max']
+network.edges['cost_avg'] = network.edges['uc_avg'] * network.edges['max']
+network.edges['cost_uom'] = '$US'
+
+# nodes
+network.nodes['cost_min'] = network.nodes['uc_min'] * network.nodes['capacity']
+network.nodes['cost_max'] = network.nodes['uc_max'] * network.nodes['capacity']
+network.nodes['cost_avg'] = network.nodes['uc_avg'] * network.nodes['capacity']
+network.nodes['cost_uom'] = '$US'
 
 
 #===
 # REINDEX
 network.edges = network.edges[['id', 'asset_type', 'from_id', 'to_id', 'from_type', 'to_type',
-                               'voltage_kV', 'losses', 'length', 'min', 'max', 'cost_min',
-                               'cost_max', 'cost_avg','cost_uom','name', 'parish',
-                               'source', 'component_id', 'geometry']]
+                               'voltage_kV', 'losses', 'length', 'min', 'max', 
+                               'uc_min','uc_max', 'uc_avg','uc_uom',
+                               'cost_min','cost_max', 'cost_avg','cost_uom',
+                               'name', 'parish','source', 'component_id', 'geometry']]
 
 network.nodes = network.nodes[['id','asset_type','subtype','capacity','population',
-                              'ei', 'ei_uom', 'cost_min','cost_max','cost_avg','cost_uom',
-                              'degree','parish','title','source','geometry']]
+                              'uc_min','uc_max','uc_avg','uc_uom',
+                              'cost_min','cost_max', 'cost_avg','cost_uom',
+                              'ei', 'ei_uom','degree','parish','title','source','geometry']]
 
 verbose_print('re-indexed data',flag=verbose_flag)
 
