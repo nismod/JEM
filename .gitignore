@@ -22,3 +22,6 @@ outputs/statistics/results_arcflows.csv
 test.csv
 jamaica-infrastructure/
 src/convert_geoparquet.py
+data/world-pop/world-pop.gpkg
+data/world-pop/world-pop.gpkg-shm
+data/world-pop/world-pop.gpkg-wal
