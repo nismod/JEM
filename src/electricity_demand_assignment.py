@@ -16,7 +16,7 @@ from scripts.preprocess.preprocess_utils import assign_node_weights_by_populatio
 
 
 def assign_pop_to_sinks(network,pop_bound,
-                        epsg=3448,nodal_id='id',pop_id='TOTAL_POP'):
+                        epsg=3448,nodal_id='id',pop_id='population'):
     '''Assign population to sink nodes
     '''
     # get sinks
@@ -34,7 +34,7 @@ def assign_pop_to_sinks(network,pop_bound,
                                                             voronoi_path='../data/spatial/electricity_voronoi.shp',
                                                             )
     #remap
-    pop_mapped = new_nodes[['id','TOTAL_POP']].set_index('id')['TOTAL_POP'].to_dict()
+    pop_mapped = new_nodes[['id','population']].set_index('id')['population'].to_dict()
     # reassign
     network.nodes['population'] = network.nodes['id'].map(pop_mapped).fillna(0)
     return network

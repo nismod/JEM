@@ -52,7 +52,7 @@ from merge_elec_consumption_data import *
 
 verbose_flag=True
 remove_connected_components = True
-connected_component_tolerance = 1
+connected_component_tolerance = 99
 
 
 #=======================
