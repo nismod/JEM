@@ -1,4 +1,4 @@
-electricity_network_v0.1.gpkg
+electricity_network_vx.x.gpkg
 
 @amanmajid
 07/09/2021
@@ -18,6 +18,15 @@ Overview:
 
 Versions:
 --------
+
+	VERSION 2.0
+		- Voronoi of population assignment added
+		- Known issues:
+			1. Topology around substations is incorrect in parts
+			2. Some multilinestring data is not being properly processed by snkit functions
+			   and is hence dropped from the dataset
+			3. Hydro power plant locations unknown [fix in progress]
+			4. Demand assignment around north of island is incorrect due to errors in admin boundary layer
 
 	VERSION 1.2
 		- Costs are now provided as totals ($US) in addition to unit costs ($/MW or $/MW/km)
