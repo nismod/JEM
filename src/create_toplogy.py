@@ -250,11 +250,10 @@ network = merge_cost_data(network,
 verbose_print('done',flag=verbose_flag)
 
 
-
 #===
 # ADD POPULATION
 verbose_print('adding population...',flag=verbose_flag)
-population = gpd.read_file('../data/incoming_data/admin_boundaries.gpkg',layer='admin3')
+population = gpd.read_file('../data/population-russell/population.gpkg')
 network = assign_pop_to_sinks(network,population)
 verbose_print('done',flag=verbose_flag)
 
@@ -300,6 +299,14 @@ network.nodes['capacity'] \
         lambda x: nodal_capacity_from_edges(x['id'],network) \
             if pd.isnull(x['capacity']) else x['capacity'], axis=1 )
 
+verbose_print('done',flag=verbose_flag)
+
+
+#===
+# MAP ELEC ASSETS TO WATER ASSETS
+verbose_print('mapping water assets...',flag=verbose_flag)
+water_nodes = gpd.read_file('../data/water/merged_water_assets.shp')
+map_elec_and_water_assets(network.nodes,water_nodes)
 verbose_print('done',flag=verbose_flag)
 
 
