@@ -238,7 +238,6 @@ network.nodes.loc[(network.nodes.degree > 2) & \
 verbose_print('converted sinks of degree>0 to junctions',flag=verbose_flag)
 
 
-
 #===
 # ADD COST DATA
 verbose_print('merging cost data...',flag=verbose_flag)
@@ -248,20 +247,6 @@ network = merge_cost_data(network,
                         print_to_console=False)
 
 verbose_print('done',flag=verbose_flag)
-
-
-#===
-# ADD POPULATION
-verbose_print('adding population...',flag=verbose_flag)
-population = gpd.read_file('../data/population-russell/population.gpkg')
-network = assign_pop_to_sinks(network,population)
-verbose_print('done',flag=verbose_flag)
-
-
-#===
-# APPEND ELECTRICITY INTENSITIES
-network = append_electricity_intensities(network)
-verbose_print('appended electricity data',flag=verbose_flag)
 
 
 #===
@@ -302,12 +287,12 @@ network.nodes['capacity'] \
 verbose_print('done',flag=verbose_flag)
 
 
-#===
-# MAP ELEC ASSETS TO WATER ASSETS
-verbose_print('mapping water assets...',flag=verbose_flag)
-water_nodes = gpd.read_file('../data/water/merged_water_assets.shp')
-map_elec_and_water_assets(network.nodes,water_nodes)
-verbose_print('done',flag=verbose_flag)
+# #===
+# # MAP ELEC ASSETS TO WATER ASSETS
+# verbose_print('mapping water assets...',flag=verbose_flag)
+# water_nodes = gpd.read_file('../data/water/merged_water_assets.shp')
+# map_elec_and_water_assets(network.nodes,water_nodes)
+# verbose_print('done',flag=verbose_flag)
 
 
 #===
@@ -334,12 +319,13 @@ network.edges = network.edges[['id', 'asset_type', 'from_id', 'to_id', 'from_typ
                                'cost_min','cost_max', 'cost_avg','cost_uom',
                                'name', 'parish','source', 'component_id', 'geometry']]
 
-network.nodes = network.nodes[['id','asset_type','subtype','capacity','population',
+network.nodes = network.nodes[['id','asset_type','subtype','capacity',#'population','ei', 'ei_uom',
                               'uc_min','uc_max','uc_avg','uc_uom',
                               'cost_min','cost_max', 'cost_avg','cost_uom',
-                              'ei', 'ei_uom','degree','parish','title','source','geometry']]
+                              'degree','parish','title','source','geometry']]
 
 verbose_print('re-indexed data',flag=verbose_flag)
+
 
 #===
 # SAVE DATA
@@ -348,3 +334,16 @@ verbose_print('saving...',flag=verbose_flag)
 save_data(network)
 
 verbose_print('create_toplogy finished',flag=verbose_flag)
+
+
+# #===
+# # ADD POPULATION
+# verbose_print('adding population...',flag=verbose_flag)
+# network = assign_pop_to_sinks(network)
+# verbose_print('done',flag=verbose_flag)
+
+
+# #===
+# # APPEND ELECTRICITY INTENSITIES
+# network = append_electricity_intensities(network)
+# verbose_print('appended electricity data',flag=verbose_flag)

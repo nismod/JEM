@@ -15,23 +15,35 @@ sys.path.append('../jamaica-infrastructure')
 from scripts.preprocess.preprocess_utils import assign_node_weights_by_population_proximity
 
 
-def assign_pop_to_sinks(network,pop_bound,
-                        epsg=3448,nodal_id='id',pop_id='population'):
+def assign_pop_to_sinks(network,epsg=3448,
+                        node_id_column='id',population_id_column='population'):
     '''Assign population to sink nodes
     '''
     # get sinks
-    sinks = network.nodes[network.nodes['asset_type'] == 'sink']
+    nodes_dataframe = network.nodes[network.nodes['asset_type'] == 'sink']
+    # get parish boundaries
+    parish_boundaries = gpd.read_file('../data/spatial/else/admin-boundaries.shp')
+    # get population dataframe
+    population_dataframe = gpd.read_file('../data/population-russell/population.gpkg')
+
+    # rename
+    nodes_dataframe['parish'] = nodes_dataframe['parish'].str.replace('Kingston','KSA')
+    nodes_dataframe['parish'] = nodes_dataframe['parish'].str.replace('St. Andrew','KSA')
+    parish_boundaries['Parish'] = parish_boundaries['Parish'].str.replace('KSA','KSA')
+    parish_boundaries['Parish'] = parish_boundaries['Parish'].str.replace('St','St.')
+
     # change crs
-    sinks = sinks.to_crs(epsg=epsg)
-    pop_bound = pop_bound.to_crs(epsg=3448)
+    nodes_dataframe = nodes_dataframe.to_crs(epsg=epsg)
+    parish_boundaries = parish_boundaries.to_crs(epsg=epsg)
+    population_dataframe = population_dataframe.to_crs(epsg=epsg)
+
     # compute
-    new_nodes = assign_node_weights_by_population_proximity(sinks,
-                                                            pop_bound,
-                                                            nodal_id,
-                                                            pop_id,
-                                                            epsg=epsg,
-                                                            save=True,
-                                                            voronoi_path='../data/spatial/electricity_voronoi.shp',
+    new_nodes = assign_node_weights_by_population_proximity(nodes_dataframe=nodes_dataframe,
+                                                            parish_boundaries=parish_boundaries,
+                                                            population_dataframe=population_dataframe,
+                                                            node_id_column=node_id_column,
+                                                            population_id_column=population_id_column,
+                                                            epsg=epsg
                                                             )
     #remap
     pop_mapped = new_nodes[['id','population']].set_index('id')['population'].to_dict()
