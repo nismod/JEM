@@ -19,6 +19,15 @@ Overview:
 Versions:
 --------
 
+	VERSION 3.0
+		- Added additional hydropower nodes
+		- Population updated using latest outputs from TR
+		- The above correction fixes demand assignment in the northern part of the island
+		- Known issues:
+			1. Topology around substations is incorrect in parts
+			2. Some multilinestring data is not being properly processed by snkit functions
+			   and is hence dropped from the dataset
+
 	VERSION 2.0
 		- Voronoi of population assignment added
 		- Known issues:
