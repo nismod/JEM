@@ -271,10 +271,9 @@ def map_elec_and_water_assets(elec_nodes,water_nodes,water_id='node_id',output_c
     for i, row in gpd2.iterrows():
         nearest_elec_asset = nearest_points(row.geometry, pts3)[1]
         gpd2.loc[i,output_col_name] = gpd1.loc[gpd1.geometry.within(nearest_elec_asset),'id'].values[0]
-        count=count+1
     # append water nodes
     water_nodes[output_col_name] = water_nodes[water_id].map(\
-                    gpd2[[water_id,output_col_name]].set_index(water_id[output_col_name].to_dict())
+                    gpd2[[water_id,output_col_name]].set_index(water_id[output_col_name].to_dict()))
     # save to shapefile
     water_nodes.to_file(driver='ESRI Shapefile',filename='../data/water/mapped_water_assets.shp')
     # save to csv
