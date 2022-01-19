@@ -1,3 +1,4 @@
+import pandas as pd
 import geopandas as gpd
 import re
 from shapely.ops import nearest_points
@@ -257,24 +258,50 @@ def get_flow_nodes(network):
     return network.nodes.loc[network.nodes.asset_type.isin(['source','sink'])].copy()
 
 
-def map_elec_and_water_assets(elec_nodes,water_nodes,water_id='node_id',output_col_name='nearest_elec_asset'):
-    '''Map nearest electricity asset (pole or substation) to each energy-consumptive water node
+def process_raw_consumption_data(path):
+    '''Process raw consumption data from JPS
     '''
-    # index nodes
-    gpd1 = elec_nodes.loc[elec_nodes.subtype.isin(['pole','substation'])].reset_index(drop=True).copy()
-    gpd2 = water_nodes.loc[water_nodes.linkage == 'True'].reset_index(drop=True).copy()
-    # form unary union
-    pts3 = gpd1.geometry.unary_union
-    # init elec_asset column
-    gpd2[output_col_name] = ''
-    # loop through each water asset
-    for i, row in gpd2.iterrows():
-        nearest_elec_asset = nearest_points(row.geometry, pts3)[1]
-        gpd2.loc[i,output_col_name] = gpd1.loc[gpd1.geometry.within(nearest_elec_asset),'id'].values[0]
-    # append water nodes
-    water_nodes[output_col_name] = water_nodes[water_id].map(\
-                    gpd2[[water_id,output_col_name]].set_index(water_id[output_col_name].to_dict()))
-    # save to shapefile
-    water_nodes.to_file(driver='ESRI Shapefile',filename='../data/water/mapped_water_assets.shp')
-    # save to csv
-    water_nodes[[water_id,output_col_name]].to_csv('../data/water/mapped_water_assets.shp',index=False)
+    elec_data  = pd.read_csv(path)
+    elec_data  = elec_data[['PARISH','Year','PARISH LOAD']]
+    # pivot data
+    elec_data  = elec_data.pivot(index='PARISH',columns='Year')
+    elec_data.columns = [str(i[1]) for i in elec_data.columns.values]
+    elec_data = elec_data.reset_index()
+    # convert str to data
+    try:
+        for col in ['2014', '2015', '2016', '2017', '2018', '2019', '2020',]:
+            elec_data[col] = elec_data[col].str.strip().str.replace(',','')
+            elec_data[col] = elec_data[col].astype(float)
+    except:
+        pass
+    # rename parish col
+    elec_data['Parish'] = elec_data['PARISH']
+    elec_data = elec_data.drop(['PARISH'],axis=1)
+    # rename parish names
+    elec_data.Parish = elec_data.Parish.str.replace('Portmore', 'St. Catherine')
+    elec_data.Parish = elec_data.Parish.str.replace('KSAN', 'St. Andrew')
+    elec_data.Parish = elec_data.Parish.str.replace('KSAS', 'Kingston')
+    # group KSAN and KSAS data
+    elec_data = elec_data.groupby(by=['Parish']).sum().reset_index()
+    # get latest year
+    elec_data = elec_data[['Parish',max(elec_data.columns.drop('Parish'))]]
+    return elec_data
+
+
+def append_energy_data_to_boundaries(boundaries,elec_data):
+    '''Combine energy data and admin boundaries
+    '''
+    elec_dict = elec_data.set_index('Parish')['2020'].to_dict()
+    boundaries['consumption'] = boundaries['PARISH'].map(elec_dict)
+    boundaries['ei'] = boundaries.consumption / boundaries.POP2001
+    boundaries['ei_uom'] = 'KW/person'
+    return boundaries[['PARISH','POP2001','consumption','ei','ei_uom','geometry',]]
+
+
+def get_ei_by_parish():
+    '''Get a dataframe of electricity intensities by parish
+    '''
+    elec_data = process_raw_consumption_data('../data/energy-demand/energy_consumption.csv')
+    boundaries = gpd.read_file('../data/incoming_data/admin_boundaries.gpkg',layer='admin1')
+    boundaries = append_energy_data_to_boundaries(boundaries,elec_data)
+    return boundaries

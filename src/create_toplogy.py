@@ -52,7 +52,7 @@ from merge_elec_consumption_data import *
 
 verbose_flag=True
 remove_connected_components = True
-connected_component_tolerance = 99
+connected_component_tolerance = 1
 
 
 #=======================
@@ -309,6 +309,17 @@ network.nodes['cost_min'] = network.nodes['uc_min'] * network.nodes['capacity']
 network.nodes['cost_max'] = network.nodes['uc_max'] * network.nodes['capacity']
 network.nodes['cost_avg'] = network.nodes['uc_avg'] * network.nodes['capacity']
 network.nodes['cost_uom'] = '$US'
+
+
+#===
+# ADD PARISH
+verbose_print('adding parish to nodes...',flag=verbose_flag)
+parish_boundaries = gpd.read_file('../data/spatial/else/admin-boundaries.shp')
+parish_boundaries = parish_boundaries[['Parish','geometry']]
+
+network.nodes['parish'] = network.nodes.sjoin(parish_boundaries, \
+                                predicate='within').drop('index_right',axis=1)['Parish']
+verbose_print('done',flag=verbose_flag)
 
 
 #===
