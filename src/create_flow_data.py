@@ -18,7 +18,6 @@ sys.path.append("../../")
 
 # Import local functions
 from utils import *
-from merge_elec_consumption_data import *
 
 #=======================
 # PROCESSING
@@ -41,8 +40,8 @@ def compute_supply_demand(nodes):
 # path_to_nodes = '../data/demo/nodes_demo.shp'
 # path_to_edges = '../data/demo/edges_demo.shp'
 
-path_to_nodes = '../data/spatial/infrasim-network/version_1.0/nodes_component_1.shp'
-path_to_edges = '../data/spatial/infrasim-network/version_1.0/edges_component_1.shp'
+path_to_nodes = '../data/spatial/infrasim-network/nodes.shp'
+path_to_edges = '../data/spatial/infrasim-network/edges.shp'
 
 # read data
 network = read_data(path_to_nodes=path_to_nodes,
@@ -65,3 +64,5 @@ flow_nodes = flow_nodes.astype('int64')
 
 # save file
 flow_nodes.to_csv('../data/csv/generated_nodal_flows.csv',index=False)
+
+print('done')
