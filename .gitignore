@@ -8,12 +8,16 @@ data/incoming_data/*
 data/energy-demand/*
 data/csv/*
 
+linux/data/*
+linux/jem/*
+linux/outputs/*
+linux/src/*
+
 _archived/*
 documents/*
 snkit/*
 _tmp/*
 _gpkg/*
-linux/*
 jamaica-infrastructure/*
 _gpkg/electricity_networkv_v1.0.gpkg
 
