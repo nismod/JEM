@@ -29,12 +29,12 @@ def compute_supply_demand(nodes):
     # supply
     # capacity (MW) * 10 ** 3 = kW
     nodes.loc[nodes.asset_type == 'source', 'flow'] = \
-        nodes.loc[nodes.asset_type == 'source', 'capacity'] * 10 ** 6
+        nodes.loc[nodes.asset_type == 'source', 'capacity'] * 10 ** 3
     # demand
     # persons * kW/person = kW
     nodes.loc[nodes.asset_type == 'sink', 'flow'] = \
         nodes.loc[nodes.asset_type == 'sink', 'population'] * \
-            nodes.loc[nodes.asset_type == 'sink', 'ei'] 
+            nodes.loc[nodes.asset_type == 'sink', 'ei'] * 10 ** 3
     return nodes
 
 # path_to_nodes = '../data/demo/nodes_demo.shp'

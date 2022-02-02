@@ -311,9 +311,3 @@ class jem():
         '''
         self.model.computeIIS()
         self.model.write(metainfo['infrasim_cache']+'model-debug-report.ilp')
-
-
-    def postprocess(self):
-        ''' Post processing of results 
-        '''
-        print('to do')

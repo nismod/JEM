@@ -47,13 +47,17 @@ class analyse():
         return idx[['node','shortfall','timestep']].reset_index(drop=True)
     
     
-    def total_customers_affected(self):
+    def customers_affected(self):
+        '''Return total population affected 
+        '''
         n = self.nodes_with_shortfall().node.to_list()
         p = self.get_population_at_nodes(nodes=n)
         return p.population.sum().astype('int')
     
     
-    def customers_affected(self):
+    def customers_affected_total(self):
+        '''Return population affected 
+        '''
         n = self.nodes_with_shortfall().node.to_list()
         p = self.get_population_at_nodes(nodes=n)
         p.population = p.population.astype('int')
