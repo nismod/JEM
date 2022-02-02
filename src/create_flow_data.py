@@ -29,7 +29,7 @@ def compute_supply_demand(nodes):
     # supply
     # capacity (MW) * 10 ** 3 = kW
     nodes.loc[nodes.asset_type == 'source', 'flow'] = \
-        nodes.loc[nodes.asset_type == 'source', 'capacity'] * 10 ** 3
+        nodes.loc[nodes.asset_type == 'source', 'capacity'] * 10 ** 6
     # demand
     # persons * kW/person = kW
     nodes.loc[nodes.asset_type == 'sink', 'flow'] = \

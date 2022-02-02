@@ -69,9 +69,26 @@ class analyse():
         '''
         return self.edge_flows[(self.edge_flows.from_id == 'super_source') & \
                                (self.edge_flows.flow > 0)].copy().reset_index(drop=True)
+                
     
-    
-    def get_population_at_nodes(self,nodes):
-        '''Return population at list of nodes
+    def get_population_at_nodes(self,nodes,col_id=None):
+        '''Return population for list of nodes
         '''
-        return self.nodes[self.nodes.id.isin(nodes)][['id','population']]
+        if not col_id:
+            return self.nodes[self.nodes.id.isin(nodes)][['id','population']].reset_index(drop=True)
+        else:
+            population = self.nodes[self.nodes.id.isin(nodes)][['id','population']]
+            population[col_id] = population['id']
+        return population[[col_id,'population']].reset_index(drop=True)
+    
+
+    def get_demand_at_nodes(self,nodes,col_id=None):
+        '''Return demand for list of nodes
+        '''
+        demand = self.flows[self.flows.node.isin(nodes)][['node','flow']]
+        demand['demand'] = demand['flow']
+        if not col_id:
+            return demand[['node','demand']].reset_index(drop=True)
+        else:
+            demand[col_id] = demand['node']
+            return demand[[col_id,'demand']].reset_index(drop=True)
