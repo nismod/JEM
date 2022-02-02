@@ -295,13 +295,24 @@ def append_energy_data_to_boundaries(boundaries,elec_data):
     boundaries['consumption'] = boundaries['PARISH'].map(elec_dict)
     boundaries['ei'] = boundaries.consumption / boundaries.POP2001
     boundaries['ei_uom'] = 'KW/person'
-    return boundaries[['PARISH','POP2001','consumption','ei','ei_uom','geometry',]]
+    return boundaries[['PARISH','population','consumption','ei','ei_uom']]
 
 
 def get_ei_by_parish():
     '''Get a dataframe of electricity intensities by parish
     '''
     elec_data = process_raw_consumption_data('../data/energy-demand/energy_consumption.csv')
-    boundaries = gpd.read_file('../data/incoming_data/admin_boundaries.gpkg',layer='admin1')
+    boundaries = gpd.read_file('../data/population-russell/population.gpkg')
+    # fix notation in boundaries file
+    boundaries.PARISH = boundaries.PARISH.str.title()
+    boundaries.loc[boundaries.PARISH.str.contains('Catherine'),'PARISH'] = 'St. Catherine'
+    boundaries.loc[boundaries.PARISH.str.contains('Mary'),'PARISH'] = 'St. Mary'
+    boundaries.loc[boundaries.PARISH.str.contains('Andrew'),'PARISH'] = 'St. Andrew'
+    boundaries.loc[boundaries.PARISH.str.contains('Elizabeth'),'PARISH'] = 'St. Elizabeth'
+    boundaries.loc[boundaries.PARISH.str.contains('Thomas'),'PARISH'] = 'St. Thomas'
+    boundaries.loc[boundaries.PARISH.str.contains('James'),'PARISH'] = 'St. James'
+    boundaries.loc[boundaries.PARISH.str.contains('Ann'),'PARISH'] = 'St. Ann'
+    boundaries = boundaries.groupby(by='PARISH').sum().reset_index()
+    # append energy data
     boundaries = append_energy_data_to_boundaries(boundaries,elec_data)
     return boundaries
