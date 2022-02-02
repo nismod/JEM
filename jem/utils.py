@@ -348,5 +348,5 @@ def get_node_names(nodes,index_column,lookup,index_column2=None,lookup2=None,ind
 def get_flow_at_nodes(flows,list_of_nodes):
     ''' Get flows of specific nodes
     '''
-    idx_flows = flows.loc[flows.Node.isin(list_of_nodes)].reset_index(drop=True)
+    idx_flows = flows.loc[flows.node.isin(list_of_nodes)].reset_index(drop=True)
     return idx_flows

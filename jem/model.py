@@ -110,12 +110,16 @@ class jem():
         self.edges_to_attack = kwargs.get('edges_to_attack',None)
         
         # zero edges associated with attackable nodes
-        if self.nodes_to_attack is not None:
+        if not self.nodes_to_attack:
+            pass
+        else:
             self.edge_indices.loc[self.edge_indices.from_id.isin(self.nodes_to_attack),'max'] = 0
             self.edge_indices.loc[self.edge_indices.to_id.isin(self.nodes_to_attack),'max'] = 0
         
         # zero attackable edges
-        if self.edges_to_attack is not None:
+        if not self.edges_to_attack:
+            pass
+        else:
             self.edge_indices.loc[self.edge_indices.id.isin(self.edges_to_attack),'max'] = 0
 
 
