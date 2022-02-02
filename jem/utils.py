@@ -213,7 +213,7 @@ def tidy(flows):
     '''
     flows['timestep'] = [i for i in range(1,len(flows)+1)]
     id_vars = metainfo['flow_header'] + ['timestep']
-    tidy = flows.melt(id_vars=id_vars,var_name='Node',value_name='flow')
+    tidy = flows.melt(id_vars=id_vars,var_name='node',value_name='flow')
     return tidy
 
 
@@ -265,8 +265,8 @@ def arc_indicies_as_dict(self,var_name):
 def flows_as_dict(flows):
     ''' Convert flows from csv to dict
     '''
-    flows_dict = flows[['Node','timestep','flow']]
-    flows_dict = flows_dict.set_index(keys=['Node','timestep']).to_dict()['flow']
+    flows_dict = flows[['node','timestep','flow']]
+    flows_dict = flows_dict.set_index(keys=['node','timestep']).to_dict()['flow']
     return flows_dict
 
 
