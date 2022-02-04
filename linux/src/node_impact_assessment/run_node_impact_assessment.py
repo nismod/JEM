@@ -19,15 +19,19 @@ print('')
 restart_mode = False
 save_after_iterations = 500
 time_script = True
+max_iterations = 45000
+number_of_nodes = 19
+
+
+
+#--------------
+# RUN
 
 print('Config')
 print('------')
 print('Restart mode: ' + str(restart_mode))
 print('Save archive after ' + str(save_after_iterations) + ' iterations')
 print('')
-
-#--------------
-# RUN
 
 print('Log')
 print('------')
@@ -64,7 +68,7 @@ else:
     def node_indexer(input_arg):
         '''return indices to use to sample nodes dataframe for batch run
         '''
-        a = np.linspace(0,45000,19)
+        a = np.linspace(0,max_iterations,number_of_nodes)
         return int(a[input_arg-1]),int(a[input_arg])
         
     n1,n2 = node_indexer(user_input)
