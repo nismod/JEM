@@ -11,7 +11,8 @@ data/csv/*
 linux/data/*
 linux/jem/*
 linux/outputs/*
-linux/src/*
+linux/src/data/*
+linux/src/outputs/*
 
 _archived/*
 documents/*
