@@ -7,6 +7,7 @@ data/risk-results/*
 data/incoming_data/*
 data/energy-demand/*
 data/csv/*
+data/single_point_failure/*
 
 linux/data/*
 linux/jem/*
