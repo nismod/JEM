@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --partition=interactive
 #SBATCH --mail-type=BEGIN,END  --mail-user=aman.majid@ouce.ox.ac.uk
-#SBATCH --array=1-19
+#SBATCH --array=1-20
 
 module load Gurobi/9.1.2-GCCcore-10.3.0
 module load Anaconda3//2020.11
