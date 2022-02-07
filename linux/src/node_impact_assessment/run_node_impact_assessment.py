@@ -1,15 +1,15 @@
 '''
 
-run_node_impact_assessment.py
+run_sink_impact_assessment.py
 
     This script damages nodes one-at-a-time (single point failure analysis) to evaluate
-    the number of sinks damaged. 
+    the number of sinks damaged. It is a computationally intensive script.
 
 '''
 print('')
 print('')
 print('-----------------------------------------------------------------')
-print('run_node_impact_assessment.py')
+print('run_sink_impact_assessment.py')
 print('')
 
 
@@ -20,7 +20,8 @@ restart_mode = False
 save_after_iterations = 500
 time_script = True
 max_iterations = 45000
-number_of_nodes = 20
+number_of_nodes = 19
+
 
 
 #--------------
@@ -35,7 +36,7 @@ print('')
 print('Log')
 print('------')
 
-import os
+import sys
 import time
 import pandas as pd
 from tqdm import tqdm
@@ -56,15 +57,13 @@ print('imported modules')
 path_to_flows = '../../data/generated_nodal_flows.csv'
 path_to_nodes = '../../data/nodes.shp'
 path_to_edges = '../../data/edges.shp'
-output_dir    = '../../outputs/node_impact_assessment/'
 
-# read node data
 nodes = gpd.read_file(path_to_nodes)
 
 #reindex node
 user_input = int(sys.argv[1:][0])
 if not user_input:
-    output_file_path = 'node_impact_assessment_'
+    output_file_path = '../../outputs/node_impact_assessment/node_impact_assessment_'
 else:
     def node_indexer(input_arg):
         '''return indices to use to sample nodes dataframe for batch run
@@ -74,30 +73,7 @@ else:
         
     n1,n2 = node_indexer(user_input)
     nodes = nodes.iloc[n1:n2].reset_index(drop=True)
-    output_file_path = 'node_impact_assessment_batch_' + str(user_input) 
-
-if not restart_mode:
-    pass
-else:
-    print('initiating restart mode...')
-    try:
-        batch_max_iteration = [i for i in os.listdir(output_dir + 'archive/') if output_file_path in i]
-        batch_max_iteration = [i.split('_')[6] for i in batch_max_iteration]
-        batch_max_iteration = [int(i.split('.')[0]) for i in batch_max_iteration]
-        batch_max_iteration = max(batch_max_iteration)
-    except:
-        print('Error! could not read archive from previous run')
-    
-    # define filename
-    batch_filename = output_dir + 'archive/' + output_file_path + '_iteration_' + str(batch_max_iteration) + '.csv'
-    print('found previous archive ' + output_file_path + '_iteration_' + str(batch_max_iteration) + '.csv')
-
-    # read in last archive
-    previous_archive = pd.read_csv(batch_filename)
-
-    # get edges not yet analysed
-    nodes_analysed = previous_archive.attacked_node_id.unique().tolist()
-    nodes = nodes.loc[~nodes.id.isin(nodes_analysed)].reset_index(drop=True)
+    output_file_path = '../../outputs/node_impact_assessment/node_impact_assessment_batch_' + str(user_input) + '_iteration_'
 
 #nodes_to_attack = nodes.head(4).id.to_list()
 nodes_to_attack = nodes.id.to_list()
@@ -105,13 +81,8 @@ nodes_to_attack = nodes.id.to_list()
 
 print('loaded nodes to attack')
 
-if not restart_mode:
-    results_dataframe = []
-    count = 1
-else:
-    results_dataframe = previous_archive.copy()
-    count = previous_archive.iteration_number.max() + 1
-
+results_dataframe = []
+count = 1
 print('beginning loop...')
 for i in range(0,len(nodes_to_attack)):
     if not time_script:
@@ -148,6 +119,8 @@ for i in range(0,len(nodes_to_attack)):
         run.optimise(print_to_console=False)
         # init results
         results = analyse(model_run=run)
+
+        print('super source flow: ' + str(results.edge_flows.loc[results.edge_flows.from_id == 'super_source'].flow.sum()))
 
         # get results
         nodes_with_shortfall = results.nodes_with_shortfall().node.to_list()
@@ -196,41 +169,21 @@ for i in range(0,len(nodes_to_attack)):
         df['iteration_time_seconds'] = time_difference
 
     # append
-    if not restart_mode:
-        results_dataframe.append(df)
-    else:
-        results_dataframe = results_dataframe.append(df,ignore_index=True)
-
+    results_dataframe.append(df)
     # append counter
     print('completed iteration ' + str(count) + ' of ' + str(len(nodes_to_attack)))
     # save
     if count % save_after_iterations == 0:
-
-        if not restart_mode:
-            tmp_df = pd.concat(results_dataframe,ignore_index=True)
-        else:
-            tmp_df = results_dataframe.copy()
-        
-        # check if archive dir exists
-        if not os.path.isdir(output_dir + 'archive/'):
-            os.makedirs(output_dir + 'archive/')
-
-        # save archive
-        tmp_df.to_csv(output_dir + 'archive/' + output_file_path + '_iteration_' + str(count) + '.csv',index=False)
+        tmp_df = pd.concat(results_dataframe,ignore_index=True)
+        tmp_df.to_csv(output_file_path + str(count) + '.csv',index=False)
         print('saved archive at iteration number ' + str(count))
     count = count + 1
 
 print('done')
 
 print('Saving results...')
-
-if not restart_mode:
-    results_dataframe = pd.concat(results_dataframe,ignore_index=True)
-else:
-    pass
-
-results_dataframe.to_csv(output_dir + output_file_path + '.csv',index=False)
-
+results_dataframe = pd.concat(results_dataframe,ignore_index=True)
+results_dataframe.to_csv(output_file_path + '.csv',index=False)
 print('done')
 
 print('-----------------------------------------------------------------')
