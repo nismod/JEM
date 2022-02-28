@@ -49,3 +49,12 @@ data/water/waste_water_facilities_NWC_linkage.gpkg
 data/water/waste_water_facilities_NWC_linkage.gpkg-shm
 data/water/waste_water_facilities_NWC_linkage.gpkg-wal
 manuscript/majid_et_al_jem.docx
+data/water/.DS_Store
+data/water/mapped_water_assets.csv
+data/water/mapped_water_assets.dbf
+data/water/mapped_water_assets.qmd
+data/water/mapped_water_assets.shp
+data/water/mapped_water_assets.dbf
+data/water/mapped_water_assets.shp
+data/population-russell/population.gpkg-shm
+data/population-russell/population.gpkg-wal
