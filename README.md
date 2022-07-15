@@ -50,7 +50,7 @@ Get a [Gurobi license](https://www.gurobi.com/downloads/)
 Create project enviroment using the config file in this directory (only tested on macOS Big Sur):
 
 ```
-mamba env update -n setup_tutorials --file environment.yml
+mamba env update -n JEM --file environment.yml
 conda activate ./env
 ```
 
