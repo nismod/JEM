@@ -43,11 +43,11 @@ The model requires [Gurobi](https://www.gurobi.com) and the associated [GurobiPy
 <i>Note</i>: The Gurobi package requires a license for usage but this can be obtained freely for academic use. <!-- An open-source alternative version of the model is currently being developed in the [PuLP](https://github.com/coin-or/pulp) library and the [Julia](https://julialang.org) programming language.   -->
 
 ### Getting started
-Clone or download this repository.
+- Clone or download this repository.
 
-Get a [Gurobi license](https://www.gurobi.com/downloads/)
+- Get a [Gurobi license](https://www.gurobi.com/downloads/)
 
-Create project enviroment using the config file in this directory (only tested on macOS Big Sur):
+- Create project enviroment using the config file in this directory (only tested on macOS Big Sur):
 
 ```
 mamba env update -n JEM --file environment.yml
@@ -61,7 +61,7 @@ conda env create --prefix ./env --file environment.yml
 conda activate ./env
 ```
 
-See the [demo notebook](https://github.com/amanmajid/InfraSim/blob/main/demo/demo.ipynb) for a small demonstration.
+- See the [demo notebook](https://github.com/amanmajid/InfraSim/blob/main/demo/demo.ipynb) for a small demonstration.
 
 <!-- ### To Do
 - Implement the InfraSim model using Julia code to allow users to choose their solver
