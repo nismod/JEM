@@ -54,7 +54,7 @@ def harmonise_grid(
     return n_cells, minimum - buffer, maximum + buffer
 
 
-filename = "/soge-home/projects/mistral/jamaica-ccri/boundaries/jamaica.gpkg"
+filename = "/soge-home/projects/mistral/jamaica-ccri/processed_data/boundaries/jamaica.gpkg"
 bounds = gpd.read_file(filename, layer="jamaica")
 print(bounds.crs)  # EPSG:3448
 
@@ -109,14 +109,13 @@ rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
 points_df["grid_row"] = rows
 points_df["grid_col"] = cols
 
-
 grid_ids = grid_ids.reshape((grid_height, grid_width))
 point_grid_ids = grid_ids[rows, cols]
 points_df["grid_ids"] = point_grid_ids
 points_df.to_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
     layer="nodes",
-    driver="GPKG",
+    driver="gpkg",
 )
 
 
@@ -142,10 +141,11 @@ grid_intersections["length_m"] = grid_intersections["geometry"].length
 grid_intersections = snail.intersection.apply_indices(
     grid_intersections, grid, index_i="i_0", index_j="j_0"
 )
+
 points_df = gpd.read_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
     layer="nodes",
-    driver="GPKG",
+    # driver="gpkg",
 )
 lines_df = grid_intersections.copy()
 lines_df["geometry"] = lines_df["geometry"].centroid
@@ -186,7 +186,7 @@ lines_df = pd.merge(lines_geo_, lines_df, how="outer", left_on="id", right_on="i
 lines_df.to_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
     layer="edges",
-    driver="GPKG",
+    driver="gpkg",
 )
 
 
