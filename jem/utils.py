@@ -236,7 +236,9 @@ def add_time_to_edges(flows,edges):
     # add time
     edges['timestep'] = 1
     #repeat for each timestep
-    new_edges = edges.append( [edges]*(timesteps-1) )
+    #new_edges = edges.append( [edges]*(timesteps-1) )
+    edges_list = [edges] * (timesteps - 1)
+    new_edges = pd.concat([edges] + edges_list, ignore_index=True)
     #create time indices in loop
     tt = []
     for i in range(0,timesteps):
@@ -286,7 +288,7 @@ def add_super_source(nodes,edges):
     
     new_edges = pd.concat(new_edges,ignore_index=True)
     
-    return edges.append(new_edges, ignore_index=True)
+    return pd.concat([edges, new_edges], ignore_index=True) # edges.append(new_edges, ignore_index=True)
 
 
 def add_super_sink(nodes,edges):
@@ -304,7 +306,7 @@ def add_super_sink(nodes,edges):
     
     new_edges = pd.concat(new_edges,ignore_index=True)
     
-    return edges.append(new_edges, ignore_index=True)
+    return pd.concat([edges, new_edges], ignore_index=True) # edges.append(new_edges, ignore_index=True)
 
 
 def normalise_column(df_column):
