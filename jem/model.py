@@ -39,6 +39,11 @@ class jem():
         elif '.csv' in nodes and '.csv' in edges:
             nodes = pd.read_csv(nodes)
             edges = pd.read_csv(edges)
+
+        # else read gpkg
+        elif '.gpkg' in nodes and '.gpkg' in edges:
+            nodes = gpd.read_file(nodes, layer = 'nodes')
+            edges = gpd.read_file(edges, layer = 'edges')
         
         # read flow data
         flows = pd.read_csv(flows)
