@@ -16,7 +16,7 @@ gdp_columns = [
     if c not in ("id", "total_GDP", "GDP_unit")
 ]
 electricity_nodes_failure_results = pd.read_csv(
-    "/Volumes/T7 Shield/ox_work_current/jamaica/JEM/notebook/ox_jem_test_multi_network_run.csv"
+    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/ox_jem_multi_network_impact_assessment.csv"
 )[["grid_id", "attacked_edge_id", "attacked_node_id", "affected_node_id"]]
 electricity_nodes_failures = pd.merge(
     electricity_nodes_failure_results,
@@ -37,6 +37,6 @@ electricity_nodes_failures["economic_loss"] = electricity_nodes_failures[
 ].sum(axis=1)
 electricity_nodes_failures["loss_unit"] = "JD/day"
 electricity_nodes_failures.to_csv(
-    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/multi_point_failure_electricity_nodes_and_edges_economic_losses_no_water.csv",
+    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/multi_network_failure_electricity_nodes_and_edges_economic_losses_no_water.csv",
     index=False,
 )
