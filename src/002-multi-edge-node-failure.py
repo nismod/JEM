@@ -50,7 +50,7 @@ from jem.model import jem
 from jem.utils import *
 
 import multiprocessing
-
+from os import getpid
 
 # print('imported modules')
 
@@ -72,7 +72,7 @@ try:
 except:
     user_input = 1
 if not user_input:
-    output_file_path = "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/node_impact_assessment_"
+    output_file_path = "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/ox_jem_multi_network_failure_"  #node_impact_assessment_"
 else:
 
     def node_indexer(input_arg):
@@ -85,8 +85,8 @@ else:
     edges = edges.iloc[n1:n2]
     output_file_path = (
         "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/node_impact_assessment_batch_"
-        + str(user_input)
-        + "_iteration_"
+        #+ str(user_input)
+        #+ "_iteration_"
     )
 
 # split dataframe for multiprocessing
@@ -98,17 +98,16 @@ def split_dataframe(df, chunk_size):
     return chunks
 
 
-grid_ids = list(edges["grid_ids"].unique())[
-    0:10
-]  # temp sample # TODO: update this after test run on cluster
+grid_ids = list(edges["grid_ids"].unique()) # [ 0:1000]  # temp sample # TODO: update this after test run on cluster
 
 
-chunk_size = 50
+chunk_size = 10
 grid_id_chunks = split_dataframe(grid_ids, chunk_size)
 
 
 def compute_failure(df):
 
+    pid = getpid()
     results_dataframe = pd.DataFrame()
 
     for grid_id in df: # grid_ids:
@@ -231,10 +230,10 @@ def compute_failure(df):
 
         print("done")
 
-        print("Saving results...")
-        # results_dataframe = pd.concat([results_dataframe],ignore_index=True)
-
-        results_dataframe.to_csv(output_file_path + ".csv", index=False)
+       # print("Saving results...")
+       # results_dataframe = pd.concat([results_dataframe],ignore_index=True)
+       # return results_dataframe
+        results_dataframe.to_csv(output_file_path + str(pid) +  ".csv", index=False)
         print("done")
 
 print("-----------------------------------------------------------------")
@@ -243,10 +242,11 @@ print("-----------------------------------------------------------------")
 
 if __name__ == '__main__':
     with multiprocessing.Pool() as pool:
-        pool.map(compute_failure, grid_id_chunks)
+       pool.map(compute_failure, grid_id_chunks)
 
 
 # TODO: add a section to iterate over all output files and merge them together
-# results_dataframe.to_csv(
+# results_dataframe = pd.concat([results_dataframe],ignore_index=True)
+#results_dataframe.to_csv(
 #     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/ox_jem_multi_network_run.csv"
 # )

@@ -109,7 +109,7 @@ rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
 points_df["grid_row"] = rows
 points_df["grid_col"] = cols
 
-grid_ids = grid_ids.reshape((grid_height, grid_width))
+# grid_ids = grid_ids.reshape((grid_height, grid_width))
 point_grid_ids = grid_ids[rows, cols]
 points_df["grid_ids"] = point_grid_ids
 points_df.to_file(
@@ -176,7 +176,7 @@ lines_df["grid_row"] = rows
 lines_df["grid_col"] = cols
 
 
-grid_ids = grid_ids.reshape((grid_height, grid_width))
+# grid_ids = grid_ids.reshape((grid_height, grid_width))
 point_grid_ids = grid_ids[rows, cols]
 lines_df["grid_ids"] = point_grid_ids
 del lines_df["geometry"]

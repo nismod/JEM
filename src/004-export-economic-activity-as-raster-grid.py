@@ -19,16 +19,16 @@ grid_id_df = pd.DataFrame(grid_ids.flatten())
 grid_id_df.rename(columns={0: "grid_id"}, inplace=True)
 # read in results
 results_dataframe = pd.read_csv(
-    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/ox_jem_multi_network_impact_assessment.csv"
+        "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/multi_network_failure_electricity_nodes_and_edges_economic_losses_no_water.csv"
 )
 merge = pd.merge(
     grid_id_df, results_dataframe, how="left", right_on="grid_id", left_on="grid_id"
 )
-merge = merge.groupby(["grid_id"]).agg({"population_affected": "sum"})
-merge["population_affected"] = merge["population_affected"].fillna(0)
+merge = merge.groupby(["grid_id"]).agg({"economic_loss": "sum"})
+merge["economic_loss"] = merge["economic_loss"].fillna(0)
 merge.reset_index(inplace=True)
 for index, row in merge.iterrows():
-    grid_ids[grid_ids == row["grid_id"]] = row["population_affected"]
+    grid_ids[grid_ids == row["grid_id"]] = row["economic_loss"]
 
 # filepath for original empty grid
 dataset = r"/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_empty_grid.tiff"
@@ -46,7 +46,7 @@ kwargs = raster.meta
 kwargs.update(dtype=rasterio.float32, count=1, compress="lzw")
 
 with rasterio.open(
-    os.path.join(outpath, "jamaica_1km_affected_population_grid.tiff"), "w", **kwargs
+    os.path.join(outpath, "jamaica_1km_economic_loss_grid.tiff"), "w", **kwargs
 ) as dst:  # TODO: hard-coded atm
     # TODO: test to write multiple bands at the same time / add bands to the same raster file
     dst.write_band(1, grid_ids.astype(rasterio.float32))
