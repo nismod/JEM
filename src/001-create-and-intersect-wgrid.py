@@ -88,37 +88,66 @@ with rasterio.open(tiff_file_path) as src:
     grid_width = src.width
     grid_height = src.height
 
+
+# Export grid_ids as .tiff file
+tiff_file_path = "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_grid_ids.tiff"
+
+with rasterio.open(tiff_file_path, 'w', driver='GTiff', height=grid_height, width=grid_width,
+                   count=1, dtype=rasterio.uint32, crs=src.crs, transform=grid_transform) as dst:
+    dst.write(grid_ids.astype(rasterio.uint32), 1)
+
+
+# TODO: update sections below to get value of raster file instead of querying grid_ids (although still a valid approach)
+
 # Read the points dataset
 points_df = gpd.read_file(
     "/soge-home/projects/mistral/jamaica-ccri/processed_data/networks/energy/electricity_network_v3.2.gpkg",
     layer="nodes",
 )
-# print(points_df.crs)
-points_df["x"] = points_df["geometry"].x
-points_df["y"] = points_df["geometry"].y
 
-# Extract coordinates into numpy arrays
-x_coords = points_df["x"].to_numpy()
-y_coords = points_df["y"].to_numpy()
+##### v01 #####
+# # print(points_df.crs)
+# points_df["x"] = points_df["geometry"].x
+# points_df["y"] = points_df["geometry"].y
 
-# Calculate the grid cell indices for each point
-cols = ((x_coords - grid_transform.c) / grid_transform.a).astype(int)
-#rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
-rows = ((grid_transform.f - y_coords) / grid_transform.e).astype(int)
+# # Extract coordinates into numpy arrays
+# x_coords = points_df["x"].to_numpy()
+# y_coords = points_df["y"].to_numpy()
 
-# Add grid cell information to the dataframe
-points_df["grid_row"] = rows
-points_df["grid_col"] = cols
+# # Calculate the grid cell indices for each point
+# cols = ((x_coords - grid_transform.c) / grid_transform.a).astype(int)
+# #rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
+# rows = ((grid_transform.f - y_coords) / grid_transform.e).astype(int)
 
-# grid_ids = grid_ids.reshape((grid_height, grid_width))
-point_grid_ids = grid_ids[rows, cols]
-points_df["grid_ids"] = point_grid_ids
-points_df.to_file(
+# # Add grid cell information to the dataframe
+# points_df["grid_row"] = rows
+# points_df["grid_col"] = cols
+
+# # grid_ids = grid_ids.reshape((grid_height, grid_width))
+# point_grid_ids = grid_ids[rows, cols]
+# points_df["grid_ids"] = point_grid_ids
+
+##### v02 #####
+hazard_paths = [
+    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_empty_grid.tiff"
+]
+hazard_files = pd.DataFrame({"path": hazard_paths})
+hazard_files, grids = snail.io.extend_rasters_metadata(hazard_files)
+grid = grids[0]
+grid_intersections_p = snail.intersection.apply_indices(
+    points_df, grid, index_i="i_0", index_j="j_0"
+)
+
+grid_intersections_p = snail.io.associate_raster_files(
+    grid_intersections_p, hazard_files
+)
+
+
+grid_intersections_p.to_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
     layer="nodes",
     driver="gpkg",
 )
-
 
 # intersect grid with edges using snail library to calculate length of interecting segments
 # for the split linestrings get centroids
@@ -136,60 +165,70 @@ edges = gpd.read_file(
     layer="edges",
 )
 edges = snail.intersection.prepare_linestrings(edges)
-grid_intersections = snail.intersection.split_linestrings(edges, grid)
+grid_intersections_l = snail.intersection.split_linestrings(edges, grid)
 print(edges.crs)  # epsg:3448 is in meters
-grid_intersections["length_m"] = grid_intersections["geometry"].length
+grid_intersections_l["length_m"] = grid_intersections_l["geometry"].length
 grid_intersections = snail.intersection.apply_indices(
-    grid_intersections, grid, index_i="i_0", index_j="j_0"
+    grid_intersections_l, grid, index_i="i_0", index_j="j_0"
 )
 
-points_df = gpd.read_file(
-    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
-    layer="nodes",
-    # driver="gpkg",
+grid_intersections_l = snail.io.associate_raster_files(
+    grid_intersections_l, hazard_files
 )
-lines_df = grid_intersections.copy()
-lines_df["geometry"] = lines_df["geometry"].centroid
 
-# Load the .tiff file
-tiff_file_path = "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_empty_grid.tiff"
-with rasterio.open(tiff_file_path) as src:
-    # Extract grid data
-    grid_ids = np.arange(src.width * src.height).reshape((src.height, src.width))
-    grid_transform = src.transform
-    grid_width = src.width
-    grid_height = src.height
-
-# print(gdf.crs)
-lines_df["x"] = lines_df["geometry"].x
-lines_df["y"] = lines_df["geometry"].y
-
-# Extract coordinates into numpy arrays
-x_coords = lines_df["x"].to_numpy()
-y_coords = lines_df["y"].to_numpy()
-
-# Calculate the grid cell indices for each point
-cols = ((x_coords - grid_transform.c) / grid_transform.a).astype(int)
-#rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
-rows = ((grid_transform.f - y_coords) / grid_transform.e).astype(int)
-
-# Add grid cell information to the dataframe
-lines_df["grid_row"] = rows
-lines_df["grid_col"] = cols
-
-
-# grid_ids = grid_ids.reshape((grid_height, grid_width))
-point_grid_ids = grid_ids[rows, cols]
-lines_df["grid_ids"] = point_grid_ids
-del lines_df["geometry"]
-lines_geo_ = edges[["id", "geometry"]]
-lines_df = pd.merge(lines_geo_, lines_df, how="outer", left_on="id", right_on="id")
-
-lines_df.to_file(
+grid_intersections_l.to_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
     layer="edges",
     driver="gpkg",
 )
+
+# points_df = gpd.read_file(
+#     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
+#     layer="nodes",
+#     # driver="gpkg",
+# )
+# lines_df = grid_intersections.copy()
+# lines_df["geometry"] = lines_df["geometry"].centroid
+
+# # Load the .tiff file
+# tiff_file_path = "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_empty_grid.tiff"
+# with rasterio.open(tiff_file_path) as src:
+#     # Extract grid data
+#     grid_ids = np.arange(src.width * src.height).reshape((src.height, src.width))
+#     grid_transform = src.transform
+#     grid_width = src.width
+#     grid_height = src.height
+
+# # print(gdf.crs)
+# lines_df["x"] = lines_df["geometry"].x
+# lines_df["y"] = lines_df["geometry"].y
+
+# # Extract coordinates into numpy arrays
+# x_coords = lines_df["x"].to_numpy()
+# y_coords = lines_df["y"].to_numpy()
+
+# # Calculate the grid cell indices for each point
+# cols = ((x_coords - grid_transform.c) / grid_transform.a).astype(int)
+# #rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
+# rows = ((grid_transform.f - y_coords) / grid_transform.e).astype(int)
+
+# # Add grid cell information to the dataframe
+# lines_df["grid_row"] = rows
+# lines_df["grid_col"] = cols
+
+
+# # grid_ids = grid_ids.reshape((grid_height, grid_width))
+# point_grid_ids = grid_ids[rows, cols]
+# lines_df["grid_ids"] = point_grid_ids
+# del lines_df["geometry"]
+# lines_geo_ = edges[["id", "geometry"]]
+# lines_df = pd.merge(lines_geo_, lines_df, how="outer", left_on="id", right_on="id")
+
+# lines_df.to_file(
+#     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
+#     layer="edges",
+#     driver="gpkg",
+# )
 
 
 # import matplotlib.pyplot as plt
