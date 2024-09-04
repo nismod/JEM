@@ -103,7 +103,8 @@ y_coords = points_df["y"].to_numpy()
 
 # Calculate the grid cell indices for each point
 cols = ((x_coords - grid_transform.c) / grid_transform.a).astype(int)
-rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
+#rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
+rows = ((grid_transform.f - y_coords) / grid_transform.e).astype(int)
 
 # Add grid cell information to the dataframe
 points_df["grid_row"] = rows
@@ -169,7 +170,8 @@ y_coords = lines_df["y"].to_numpy()
 
 # Calculate the grid cell indices for each point
 cols = ((x_coords - grid_transform.c) / grid_transform.a).astype(int)
-rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
+#rows = ((y_coords - grid_transform.f) / -grid_transform.e).astype(int)
+rows = ((grid_transform.f - y_coords) / grid_transform.e).astype(int)
 
 # Add grid cell information to the dataframe
 lines_df["grid_row"] = rows
