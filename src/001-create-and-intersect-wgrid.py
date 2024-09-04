@@ -21,6 +21,9 @@ import snail
 import snail.intersection
 import snail.io
 
+from pathlib import Path
+from glob import glob
+
 # create an empty 1km grid for Jamaica
 
 # ref: https://github.com/nismod/open-gira/blob/main/workflow/tropical-cyclone/wind_fields/wind_fields.smk#L84
@@ -129,9 +132,10 @@ points_df = gpd.read_file(
 
 ##### v02 #####
 hazard_paths = [
-    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_empty_grid.tiff"
+    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_grid_ids.tiff"
 ]
 hazard_files = pd.DataFrame({"path": hazard_paths})
+hazard_files['key'] = [Path(path).stem for path in hazard_paths]
 hazard_files, grids = snail.io.extend_rasters_metadata(hazard_files)
 grid = grids[0]
 grid_intersections_p = snail.intersection.apply_indices(
@@ -142,6 +146,7 @@ grid_intersections_p = snail.io.associate_raster_files(
     grid_intersections_p, hazard_files
 )
 
+grid_intersections_p.rename(columns={"jamaica_1km_grid_ids":"grid_ids"}, inplace =True)
 
 grid_intersections_p.to_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
@@ -155,9 +160,10 @@ grid_intersections_p.to_file(
 # merge linestings back, replacing temporary centroids geometry
 
 hazard_paths = [
-    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_empty_grid.tiff"
+    "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_1km_grid_ids.tiff"
 ]
 hazard_files = pd.DataFrame({"path": hazard_paths})
+hazard_files['key'] = [Path(path).stem for path in hazard_paths]
 hazard_files, grids = snail.io.extend_rasters_metadata(hazard_files)
 grid = grids[0]
 edges = gpd.read_file(
@@ -168,13 +174,15 @@ edges = snail.intersection.prepare_linestrings(edges)
 grid_intersections_l = snail.intersection.split_linestrings(edges, grid)
 print(edges.crs)  # epsg:3448 is in meters
 grid_intersections_l["length_m"] = grid_intersections_l["geometry"].length
-grid_intersections = snail.intersection.apply_indices(
+grid_intersections_l = snail.intersection.apply_indices(
     grid_intersections_l, grid, index_i="i_0", index_j="j_0"
 )
 
 grid_intersections_l = snail.io.associate_raster_files(
     grid_intersections_l, hazard_files
 )
+
+grid_intersections_l.rename(columns={"jamaica_1km_grid_ids":"grid_ids"}, inplace =True)
 
 grid_intersections_l.to_file(
     "/soge-home/projects/mistral/jamaica-ccri/results/grid_failures/jamaica_electricity_nodes_wgrid_ids.gpkg",
