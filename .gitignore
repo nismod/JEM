@@ -15,6 +15,8 @@ linux/outputs/*
 linux/src/data/*
 linux/src/outputs/*
 
+jem/__pycache__/*
+
 _archived/*
 documents/*
 snkit/*
