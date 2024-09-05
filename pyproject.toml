@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jem"
+description = "Jamaica Energy Model: a high-level power flow model of Jamaica's power system"
+version = "0.1"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Aman Majid" },
+  { name = "Nadia Leonova" },
+  { name = "Tom Russell", email = "tom.russell@ouce.ox.ac.uk" }
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = []
+
+[project.urls]
+Documentation = "https://github.com/nismod/jem#readme"
+Issues = "https://github.com/nismod/jem/issues"
+Source = "https://github.com/nismod/jem"
+
+[tool.hatch.envs.types]
+extra-dependencies = ["mypy>=1.0.0"]
+
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/jem tests}"
+
+[tool.coverage.run]
+source_pkgs = ["jem", "tests"]
+branch = true
+parallel = true
+omit = ["src/jem/__about__.py"]
+
+[tool.coverage.paths]
+jem = ["src/jem", "*/jem/src/jem"]
+tests = ["tests", "*/jem/tests"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
