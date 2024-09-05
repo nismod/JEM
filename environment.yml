@@ -3,15 +3,19 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - scipy
-  - shapely
-  - tqdm
+  - black
   - geopandas
+  - jupyter
   - matplotlib
+  - nbstripout
   - numpy
   - pandas
   - rasterio
+  - ruff
+  - scipy
   - seaborn
+  - shapely
+  - tqdm
   - pip:
       - nismod-snail==0.5.2
       - gurobipy==11.0.3
