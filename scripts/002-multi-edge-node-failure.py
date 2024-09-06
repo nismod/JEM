@@ -6,6 +6,7 @@ This script uses an arbitrarily defined 1x1km grid, then runs a multi point and
 edge failure analysis to evaluate the number of nodes damaged and population
 affected. It is a computationally intensive script.
 """
+import sys
 import functools
 import multiprocessing
 from pathlib import Path
@@ -13,9 +14,9 @@ from pathlib import Path
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+sys.path.append("../src/") # required for jem module
 from jem.analyse import analyse
 from jem.model import jem
-
 
 def get_empty_results(grid_id):
     return pd.DataFrame(
@@ -30,7 +31,7 @@ def get_empty_results(grid_id):
     )
 
 
-def init_pool(path_to_network):
+def init_pool(path_to_network, path_to_flows):
     global nodes
     global edges
     global flows
@@ -39,7 +40,7 @@ def init_pool(path_to_network):
     nodes = gpd.read_file(path_to_network, layer="nodes", engine="pyogrio")
     nodes = nodes[nodes["asset_type"] != "sink"].copy()
     edges = gpd.read_file(path_to_network, layer="edges", engine="pyogrio")
-    flows = pd.read_csv(flows)
+    flows = pd.read_csv(path_to_flows)
 
 
 def compute_failure(grid_id, path_to_network, path_to_flows, output_file_path):
@@ -92,8 +93,7 @@ def compute_failure(grid_id, path_to_network, path_to_flows, output_file_path):
 
 
 if __name__ == "__main__":
-    # base_path = Path("/soge-home/projects/mistral/jamaica-ccri/")
-    base_path = Path("./data/ccri")
+    base_path = Path("/soge-home/projects/mistral/jamaica-ccri/")
     path_to_flows = (
         base_path / "processed_data/networks/energy/generated_nodal_flows.csv"
     )
@@ -114,6 +114,6 @@ if __name__ == "__main__":
     )
 
     with multiprocessing.Pool(
-        initializer=init_pool, initargs=(path_to_network,)
+        initializer=init_pool, initargs=(path_to_network, path_to_flows)
     ) as pool:
         pool.map(compute_failure_partial, grid_ids, chunksize=1024)

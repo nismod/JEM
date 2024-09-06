@@ -46,11 +46,12 @@ import numpy as np
 import pandas as pd
 import rasterio
 import snail
+import snail.io
 
 
-def main():
+def main(base_path):
     # base_path = Path("/soge-home/projects/mistral/jamaica-ccri/")
-    base_path = Path("./data/ccri")
+    base_path = Path(base_path)
 
     # input paths
     boundary_file_path = base_path / "processed_data/boundaries/jamaica.gpkg"
