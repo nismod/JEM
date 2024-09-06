@@ -20,7 +20,7 @@ from .params import constants
 
 class jem:
 
-    def __init__(self, nodes, edges, flows, **kwargs):
+    def __init__(self, nodes, edges, flows, write=False, **kwargs):
 
         # Read data
         if not isinstance(nodes, pd.DataFrame):
@@ -30,6 +30,10 @@ class jem:
                 nodes = pd.read_csv(nodes)
             elif ".gpkg" in nodes:
                 nodes = gpd.read_file(nodes, layer="nodes")
+            else:
+                assert False, "Unrecognised file extension"
+        else:
+            nodes = nodes.copy()
 
         if not isinstance(edges, pd.DataFrame):
             if ".shp" in edges:
@@ -38,9 +42,15 @@ class jem:
                 edges = pd.read_csv(edges)
             elif ".gpkg" in edges:
                 edges = gpd.read_file(edges, layer="edges")
+            else:
+                assert False, "Unrecognised file extension"
+        else:
+            edges = edges.copy()
 
         if not isinstance(flows, pd.DataFrame):
             flows = pd.read_csv(flows)
+        else:
+            flows = flows.copy()
 
         # restrict timesteps
         timesteps_restriction = kwargs.get("timesteps", None)
@@ -69,10 +79,10 @@ class jem:
 
         # ---
         # Create infrasim cache files
-        # TODO is this used? how to ensure unique when multiprocessing if so???
-        utils.create_dir(path=metainfo["infrasim_cache"])
-        spatial.graph_to_csv(nodes, edges, output_dir=metainfo["infrasim_cache"])
-        flows.to_csv(metainfo["infrasim_cache"] + "flows.csv")
+        if write:
+            utils.create_dir(path=metainfo["infrasim_cache"])
+            spatial.graph_to_csv(nodes, edges, output_dir=metainfo["infrasim_cache"])
+            flows.to_csv(metainfo["infrasim_cache"] + "flows.csv")
 
         # ---
         # add time indices to edge data
@@ -207,7 +217,7 @@ class jem:
             nodes=self.nodes, index_column="asset_type", lookup="source"
         )
 
-        # get flow at water supply nodes
+        # get flow at supply nodes
         flow_dict = utils.get_flow_at_nodes(flows=self.flows, list_of_nodes=sources)
         flow_dict = utils.flows_as_dict(flows=flow_dict)
 
@@ -239,7 +249,7 @@ class jem:
             nodes=self.nodes, index_column="asset_type", lookup="sink"
         )
 
-        # get flow at water supply nodes
+        # get flow at supply nodes
         flow_dict = utils.get_flow_at_nodes(flows=self.flows, list_of_nodes=sinks)
         flow_dict = utils.flows_as_dict(flows=flow_dict)
 
@@ -290,7 +300,9 @@ class jem:
         upper_bound = utils.arc_indicies_as_dict(self, metainfo["upper_bound"])
         self.model.addConstrs(
             (
-                self.arcFlows[i, j, t] <= upper_bound[i, j, t] * 10**12
+                self.arcFlows[i, j, t]
+                <= upper_bound[i, j, t]
+                * 10**12  # TODO check if this is relaxing all upper bounds?
                 for i, j, t in self.arcFlows
             ),
             "upper_bound",
@@ -309,19 +321,17 @@ class jem:
             "lower_bound",
         )
 
-        if self._print is False:
-            pass
-        else:
+        if self._print:
             print(time.process_time() - from_id_time, "seconds")
             print("------------- MODEL BUILD COMPLETE -------------")
 
-    def optimise(self, write=True, **kwargs):
+    def optimise(self, write=False, **kwargs):
         """Function to solve GurobiPy model"""
         # write model to LP
         if write:
             self.model.write(metainfo["infrasim_cache"] + self.model.ModelName + ".lp")
         # set output flag
-        if kwargs.get("print_to_console", True) is True:
+        if kwargs.get("print_to_console", False):
             self.model.Params.LogToConsole = 1
             self.model.setParam("OutputFlag", 1)
         else:
@@ -330,7 +340,8 @@ class jem:
         self.model.optimize()
 
         # WRITE RESULTS
-        utils.create_dir(path=metainfo["outputs_data"])
+        if write:
+            utils.create_dir(path=metainfo["outputs_data"])
 
         if self.model.Status == 2:
             # arcFlows
@@ -343,13 +354,14 @@ class jem:
             results_arcflows = results_arcflows[
                 ["from_id", "to_id", "timestep", "flow"]
             ]
-            # write csv
-            results_arcflows.to_csv(
-                metainfo["outputs_data"] + "results_arcflows.csv", index=False
-            )
+            if write:
+                # write csv
+                results_arcflows.to_csv(
+                    metainfo["outputs_data"] + "results_arcflows.csv", index=False
+                )
             self.results_arcflows = results_arcflows
 
-    def debug(self, output_path=""):
+    def debug(self):
         """
         Compute model Irreducible Inconsistent Subsystem (IIS) to help deal with infeasibilies
         """

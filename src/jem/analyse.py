@@ -21,10 +21,10 @@ class analyse:
     def supply_demand_balance(self):
         """Return dataframe of supply and demand"""
         supply_nodes = get_source_nodes(self)
-        supply = self.flows[self.flows.Node.isin(supply_nodes)].flow.sum()
+        supply = self.flows[self.flows.node.isin(supply_nodes)].flow.sum()
 
         demand_nodes = get_sink_nodes(self)
-        demand = self.flows[self.flows.Node.isin(demand_nodes)].flow.sum()
+        demand = self.flows[self.flows.node.isin(demand_nodes)].flow.sum()
         return pd.DataFrame({"supply": [supply], "demand": [demand]})
 
     def total_demand_shortfall(self):
