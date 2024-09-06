@@ -14,6 +14,7 @@ import sys
 from glob import glob
 from pathlib import Path
 
+import geopandas
 import numpy as np
 import pandas as pd
 import rasterio
@@ -51,7 +52,7 @@ def read_csvs(csv_dir):
         yield pd.read_csv(csv)
 
 
-def aggregate_to_grid(dfs, shape, dtype):
+def aggregate_to_grid(dfs, varname, shape, dtype):
     output_grid_flat = np.zeros(
         output_kwargs["height"] * output_kwargs["width"], dtype=dtype
     )
@@ -66,31 +67,58 @@ def aggregate_to_grid(dfs, shape, dtype):
 
 if __name__ == "__main__":
     base_path = Path(sys.argv[1])
-    ids_tiff = base_path / "results/grid_failures/jamaica_1km_grid_ids.tiff"
+    ids_tiff = base_path / "results/grid_failures/jamaica_1km_grid_ids.tif"
+    grid_ids, output_kwargs = setup_grid(ids_tiff)
+
+    #
+    # 1. Aggregate disruption values
+    #
 
     varname = "population_affected"
     dtype = "float32"
-    grid_ids, output_kwargs = setup_grid(ids_tiff)
     dfs = read_csvs(base_path / "results/grid_failures/cell_disruption/")
-    output_grid = aggregate_to_grid(dfs, grid_ids.shape, dtype)
+    output_grid = aggregate_to_grid(dfs, varname, grid_ids.shape, dtype)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
     write_grid(out_tiff, output_grid, output_kwargs)
 
     varname = "demand_affected"
     dtype = "int32"
-    grid_ids, output_kwargs = setup_grid(ids_tiff)
     dfs = read_csvs(base_path / "results/grid_failures/cell_disruption/")
-    output_grid = aggregate_to_grid(dfs, grid_ids.shape, dtype)
+    output_grid = aggregate_to_grid(dfs, varname, grid_ids.shape, dtype)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
     write_grid(out_tiff, output_grid, output_kwargs)
 
     varname = "loss_gdp"
     dtype = "float32"
-    grid_ids, output_kwargs = setup_grid(ids_tiff)
     dfs = read_csvs(base_path / "results/grid_failures/cell_disruption_loss/")
-    output_grid = aggregate_to_grid(dfs, grid_ids.shape, dtype)
+    output_grid = aggregate_to_grid(dfs, varname, grid_ids.shape, dtype)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
+    write_grid(out_tiff, output_grid, output_kwargs)
+
+    #
+    # 2. Aggregate network node and edge cost values
+    #
+    network_path = (
+        base_path / "results/grid_failures/jamaica_electricity_network_wgrid_ids.gpkg"
+    )
+    nodes = geopandas.read_file(network_path, layer="nodes")
+    edges = geopandas.read_file(network_path, layer="edges")
+    varname = "exposure_value"
+    dtype = "float32"
+    output_grid_flat = np.zeros(
+        output_kwargs["height"] * output_kwargs["width"], dtype=dtype
+    )
+
+    for _, node in nodes.iterrows():
+        output_grid_flat[node.grid_ids] += node.cost_avg
+
+    for _, edge in edges.iterrows():
+        output_grid_flat[edge.grid_ids] += edge.length * edge.cost_avg
+
+    output_grid = output_grid_flat.reshape(grid_ids.shape)
+    output_kwargs["dtype"] = dtype
+    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
     write_grid(out_tiff, output_grid, output_kwargs)
