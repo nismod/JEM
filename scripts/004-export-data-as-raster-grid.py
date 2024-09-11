@@ -67,7 +67,7 @@ def aggregate_to_grid(dfs, varname, shape, dtype):
 
 if __name__ == "__main__":
     base_path = Path(sys.argv[1])
-    ids_tiff = base_path / "results/grid_failures/jamaica_1km_grid_ids.tif"
+    ids_tiff = base_path / "results/grid_failures/jamaica_1km_grid_ids.tiff"
     grid_ids, output_kwargs = setup_grid(ids_tiff)
 
     #
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     dfs = read_csvs(base_path / "results/grid_failures/cell_disruption/")
     output_grid = aggregate_to_grid(dfs, varname, grid_ids.shape, dtype)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
     write_grid(out_tiff, output_grid, output_kwargs)
 
     varname = "demand_affected"
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     dfs = read_csvs(base_path / "results/grid_failures/cell_disruption/")
     output_grid = aggregate_to_grid(dfs, varname, grid_ids.shape, dtype)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
     write_grid(out_tiff, output_grid, output_kwargs)
 
     varname = "loss_gdp"
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     dfs = read_csvs(base_path / "results/grid_failures/cell_disruption_loss/")
     output_grid = aggregate_to_grid(dfs, varname, grid_ids.shape, dtype)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
     write_grid(out_tiff, output_grid, output_kwargs)
 
     #
@@ -120,5 +120,5 @@ if __name__ == "__main__":
 
     output_grid = output_grid_flat.reshape(grid_ids.shape)
     output_kwargs["dtype"] = dtype
-    out_tiff = base_path / f"results/grid_failures/{varname}.tif"
+    out_tiff = base_path / f"results/grid_failures/{varname}.tiff"
     write_grid(out_tiff, output_grid, output_kwargs)
