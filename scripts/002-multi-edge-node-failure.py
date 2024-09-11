@@ -18,6 +18,7 @@ multiple times: "0 2" and "1 2"
 import sys
 import functools
 import multiprocessing
+import os
 import sys
 from pathlib import Path
 
@@ -183,6 +184,10 @@ if __name__ == "__main__":
         base_path / "results/grid_failures/jamaica_electricity_network_wgrid_ids.gpkg"
     )
     path_to_output = base_path / "results/grid_failures/cell_disruption"
+    
+    # check if output folder exists, create if not
+    if not os.path.exists(path_to_output):
+        os.makedirs(path_to_output)
 
     edges_split = gpd.read_file(path_to_network_split, layer="edges", engine="pyogrio")
 
