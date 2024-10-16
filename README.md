@@ -3,6 +3,9 @@
 
 <img align="center" width="800" src="https://github.com/nismod/JEM/blob/main/demo/schematic.png">
 
+![Python > 3.10](https://img.shields.io/badge/python-%3E%3D3.10-blue)
+![Active Development](https://img.shields.io/badge/status-active--development-brightgreen)
+
 This repository contains a simulation model for Jamaica's energy system formulated as an arc-node network. Based on a given supply and demand curve, JEM solves for flows of electricity across the network using linear programming.
 
 **NOTE:** The tool is currently under development and all code published here is part of an on-going project.
@@ -11,8 +14,9 @@ This repository contains a simulation model for Jamaica's energy system formulat
 **Project Lead:** Aman Majid (aman.majid@new.ox.ac.uk), University of Oxford <br>
 **Principal Investigator:** [Professor Jim Hall](https://www.eci.ox.ac.uk/people/jhall.html), University of Oxford <br>
 **Contributors and Collaborators**: <br>
-[Raghav Pant](https://github.com/itrcrisks), University of Oxford <br>
-[Tom Russell](https://github.com/tomalrussell), University of Oxford <br>
+- [Tom Russell](https://github.com/tomalrussell), University of Oxford <br>
+- [Nadia Leonova](https://github.com/nnleonova), University of Oxford <br>
+- [Raghav Pant](https://github.com/itrcrisks), University of Oxford <br>
 <!-- [JPS Co.](https://www.jpsco.com/), Jamaica <br> -->
 
 <!-- ### What's Here
@@ -49,16 +53,22 @@ The model requires [Gurobi](https://www.gurobi.com) and the associated [GurobiPy
 
 - Create project enviroment using the config file in this directory (only tested on macOS Big Sur):
 
-```
-mamba env update -n JEM --file environment.yml
-conda activate ./env
+```bash
+mamba create -n JEM python=3.11
+mamba activate JEM
 ```
 
 or
 
+```bash
+conda create -n JEM python=3.11
+conda activate JEM
 ```
-conda env create --prefix ./env --file environment.yml
-conda activate ./env
+
+- Navigate to the JEM repository and install it as a package by running:
+
+```bash
+pip install -e .
 ```
 
 - See the [demo notebook](https://github.com/amanmajid/InfraSim/blob/main/demo/demo.ipynb) for a small demonstration.
@@ -74,7 +84,7 @@ conda activate ./env
 Coming soon... -->
 
 ### Support
-This work is supported part of the [Coalition for Climate Resilient Investment (CCRI)](https://resilientinvestment.org/) project on creating a platform for infrastructure risk assessment and resilient investment prioritisation in Jamaica and is funded by the [UK Foreign, Commonwealth and Development Office (FCDO)](https://www.gov.uk/government/organisations/foreign-commonwealth-development-office).
+This work is supported by the [Coalition for Climate Resilient Investment (CCRI)](https://resilientinvestment.org/) project on creating a platform for infrastructure risk assessment and resilient investment prioritisation in Jamaica and is funded by the [UK Foreign, Commonwealth and Development Office (FCDO)](https://www.gov.uk/government/organisations/foreign-commonwealth-development-office).
 
 ### License
-Copyright (C) 2020 Aman Majid. All versions released under the [MIT License](https://opensource.org/licenses/MIT).
+Copyright (C) 2020 Aman Majid and the authors. All versions released under the [MIT License](https://opensource.org/licenses/MIT).
