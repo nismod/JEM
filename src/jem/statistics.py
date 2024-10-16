@@ -1,16 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Oct 20 13:26:12 2021
-
-@author: aqua
-"""
-
-import pandas as pd
-
 from .utils import get_source_nodes, get_sink_nodes
 
-
-class analyse:
+class statistics:
 
     def __init__(self, model_run):
         self.nodes = model_run.nodes
