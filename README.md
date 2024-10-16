@@ -1,10 +1,10 @@
+![Python > 3.9](https://img.shields.io/badge/python-%3E%3D3.10-blue)
+![Maintenance](https://img.shields.io/badge/status-maintenance-blue)
+
 # Jamaica Energy Model (JEM)
 ### A high-level power flow model of Jamaica's energy system
 
 <img align="center" width="800" src="https://github.com/nismod/JEM/blob/main/demo/schematic.png">
-
-![Python > 3.10](https://img.shields.io/badge/python-%3E%3D3.10-blue)
-![Active Development](https://img.shields.io/badge/status-active--development-brightgreen)
 
 This repository contains a simulation model for Jamaica's energy system formulated as an arc-node network. Based on a given supply and demand curve, JEM solves for flows of electricity across the network using linear programming.
 
