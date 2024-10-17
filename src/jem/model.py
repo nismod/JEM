@@ -7,16 +7,16 @@
 
 import time
 
-import geopandas as gpd
-import gurobipy as gp
 import pandas as pd
+import gurobipy as gp
+import geopandas as gpd
 
 from . import utils
 from . import spatial
 
 from .meta import metainfo
 from .params import constants
-
+from .statistics import statistics
 
 class jem:
 
@@ -62,13 +62,13 @@ class jem:
 
         # ---
         # Add super source
-        super_source = kwargs.get("super_source", False)
+        super_source = kwargs.get("super_source", True)
         if super_source:
             edges = utils.add_super_source(nodes, edges)
 
         # ---
         # Add super sink
-        super_sink = kwargs.get("super_sink", False)
+        super_sink = kwargs.get("super_sink", True)
         if super_sink:
             edges = utils.add_super_sink(nodes, edges)
 
@@ -325,6 +325,7 @@ class jem:
             print(time.process_time() - from_id_time, "seconds")
             print("------------- MODEL BUILD COMPLETE -------------")
 
+
     def optimise(self, write=False, **kwargs):
         """Function to solve GurobiPy model"""
         # write model to LP
@@ -360,6 +361,9 @@ class jem:
                     metainfo["outputs_data"] + "results_arcflows.csv", index=False
                 )
             self.results_arcflows = results_arcflows
+
+            # create subclass of results
+            self.statistics = statistics(self)
 
     def debug(self):
         """
