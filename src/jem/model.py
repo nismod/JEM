@@ -62,13 +62,13 @@ class jem:
 
         # ---
         # Add super source
-        super_source = kwargs.get("super_source", False)
+        super_source = kwargs.get("super_source", True)
         if super_source:
             edges = utils.add_super_source(nodes, edges)
 
         # ---
         # Add super sink
-        super_sink = kwargs.get("super_sink", False)
+        super_sink = kwargs.get("super_sink", True)
         if super_sink:
             edges = utils.add_super_sink(nodes, edges)
 
@@ -324,6 +324,7 @@ class jem:
         if self._print:
             print(time.process_time() - from_id_time, "seconds")
             print("------------- MODEL BUILD COMPLETE -------------")
+
 
     def optimise(self, write=False, **kwargs):
         """Function to solve GurobiPy model"""
