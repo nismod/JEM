@@ -25,7 +25,13 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  "geopandas", 
+  "gurobipy",
+  "snkit",
+  "networkx",
+  "matplotlib",
+]
 
 [project.urls]
 Documentation = "https://github.com/nismod/jem#readme"
@@ -46,7 +52,7 @@ omit = ["src/jem/__about__.py"]
 
 [tool.coverage.paths]
 jem = ["src/jem", "*/jem/src/jem"]
-tests = ["tests", "*/jem/tests"]
+# tests = ["tests", "*/jem/tests"]
 
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
