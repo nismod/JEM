@@ -36,7 +36,7 @@ micromamba activate jem-env
 pip install -e .
 ```
 
-- See the [demo notebook](https://github.com/amanmajid/InfraSim/blob/main/demo/demo.ipynb) for a small demonstration.
+- See the [demo notebook](./notebook/demo.ipynb) for a small demonstration.
 
 ### Support
 This work was initially supported by the [Coalition for Climate Resilient Investment (CCRI)](https://resilientinvestment.org/) project on creating a platform for infrastructure risk assessment and resilient investment prioritisation in Jamaica and is funded by the [UK Foreign, Commonwealth and Development Office (FCDO)](https://www.gov.uk/government/organisations/foreign-commonwealth-development-office).
