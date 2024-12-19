@@ -4,8 +4,6 @@
 # Jamaica Energy Model (JEM)
 ### A high-level power flow model of Jamaica's energy system
 
-<img align="center" width="800" src="https://github.com/nismod/JEM/blob/main/demo/schematic.png">
-
 This repository contains a simulation model for Jamaica's energy system formulated as an arc-node network. Based on a given supply and demand curve, JEM solves for flows of electricity across the network using linear programming. This tool was originally developed for a [CCRI](https://resilientinvestment.org/) project by researchers at [OPSIS, University of Oxford](https://opsis.eci.ox.ac.uk/) in 2020. The repository is now less active and is only maintained or developed occasionally.
 
 **NOTE:** The tool is currently under development and all code published here is part of an on-going project.
