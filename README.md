@@ -30,7 +30,12 @@ micromamba env create -f environment.yml -y
 micromamba activate jem-env
 ```
 
-- or using your preferred Python package manager and virtual environment, navigate to the JEM repository and install it as a package by running:
+- To install from PyPI, use:
+```bash
+pip install jamaica-energy-model
+```
+
+- Or install using the local source as an editable package, use:
 
 ```bash
 pip install -e .

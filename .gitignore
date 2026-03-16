@@ -23,3 +23,5 @@ data/*
 !data/water
 
 .DS_Store
+
+dist/*
