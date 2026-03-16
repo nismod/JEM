@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "jamaica-energy-model"
 description = "Jamaica Energy Model: a high-level power flow model of Jamaica's power system"
-version = "0.1.1"
+version = "0.1.2"
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
