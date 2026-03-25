@@ -302,7 +302,6 @@ class jem:
             (
                 self.arcFlows[i, j, t]
                 <= upper_bound[i, j, t]
-                * 10**12  # TODO check if this is relaxing all upper bounds?
                 for i, j, t in self.arcFlows
             ),
             "upper_bound",

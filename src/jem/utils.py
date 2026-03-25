@@ -251,7 +251,7 @@ def add_super_source(nodes, edges):
         {
             "from_id": "super_source",
             "to_id": nodes.id.unique(),
-            "length": constants["super_source_maximum"],
+            "length_over_voltage**2": constants["super_source_maximum"],
             "min": 0,
             "max": constants["super_source_maximum"],
         }
@@ -274,7 +274,7 @@ def add_super_sink(nodes, edges):
         {
             "from_id": nodes.id.unique(),
             "to_id": "super_sink",
-            "length": constants["super_source_maximum"],
+            "length_over_voltage**2": constants["super_source_maximum"],
             "min": 0,
             "max": constants["super_source_maximum"],
         }
